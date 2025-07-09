@@ -6,7 +6,7 @@ import (
 	"github.com/go-faster/errors"
 )
 
-func (s GetMultiplayersSummaryOrder) Validate() error {
+func (s GetMultiplayersSummaryPlayersOrder) Validate() error {
 	switch s {
 	case "asc":
 		return nil
@@ -17,15 +17,26 @@ func (s GetMultiplayersSummaryOrder) Validate() error {
 	}
 }
 
-func (s GetServerStatsByIDOKApplicationJSON) Validate() error {
-	alias := ([]GetServerStatsByIDOKItem)(s)
+func (s GetServerStatisticsByIDOKApplicationJSON) Validate() error {
+	alias := ([]ServerStatistic)(s)
 	if alias == nil {
 		return errors.New("nil is invalid value")
 	}
 	return nil
 }
 
-func (s GetServerStatsByIDOrder) Validate() error {
+func (s GetServerStatisticsByIDPrecision) Validate() error {
+	switch s {
+	case "perHour":
+		return nil
+	case "perDay":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
+}
+
+func (s GetServerStatisticsByIDTimeOrder) Validate() error {
 	switch s {
 	case "asc":
 		return nil
@@ -37,9 +48,20 @@ func (s GetServerStatsByIDOrder) Validate() error {
 }
 
 func (s GetServersByMultiplayerOKApplicationJSON) Validate() error {
-	alias := ([]GetServersByMultiplayerOKItem)(s)
+	alias := ([]ServerSummary)(s)
 	if alias == nil {
 		return errors.New("nil is invalid value")
 	}
 	return nil
+}
+
+func (s GetServersByMultiplayerPlayersOrder) Validate() error {
+	switch s {
+	case "asc":
+		return nil
+	case "desc":
+		return nil
+	default:
+		return errors.Errorf("invalid value: %v", s)
+	}
 }

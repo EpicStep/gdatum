@@ -8,7 +8,7 @@ CREATE TABLE servers_metrics_raw
     url         String,
     gamemode    String,
     lang        String,
-    players     UInt32,
+    players     Int32,
     timestamp   Datetime
 ) ENGINE = Null;
 -- +goose StatementEnd

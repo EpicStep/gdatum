@@ -18,18 +18,18 @@ import (
 
 // GetMultiplayersSummaryParams is parameters of getMultiplayersSummary operation.
 type GetMultiplayersSummaryParams struct {
-	// Sort order by online.
-	Order OptGetMultiplayersSummaryOrder
+	// Sort order by current players.
+	PlayersOrder OptGetMultiplayersSummaryPlayersOrder
 }
 
 func unpackGetMultiplayersSummaryParams(packed middleware.Parameters) (params GetMultiplayersSummaryParams) {
 	{
 		key := middleware.ParameterKey{
-			Name: "order",
+			Name: "playersOrder",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Order = v.(OptGetMultiplayersSummaryOrder)
+			params.PlayersOrder = v.(OptGetMultiplayersSummaryPlayersOrder)
 		}
 	}
 	return params
@@ -37,22 +37,22 @@ func unpackGetMultiplayersSummaryParams(packed middleware.Parameters) (params Ge
 
 func decodeGetMultiplayersSummaryParams(args [0]string, argsEscaped bool, r *http.Request) (params GetMultiplayersSummaryParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
-	// Set default value for query: order.
+	// Set default value for query: playersOrder.
 	{
-		val := GetMultiplayersSummaryOrder("desc")
-		params.Order.SetTo(val)
+		val := GetMultiplayersSummaryPlayersOrder("desc")
+		params.PlayersOrder.SetTo(val)
 	}
-	// Decode query: order.
+	// Decode query: playersOrder.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "order",
+			Name:    "playersOrder",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotOrderVal GetMultiplayersSummaryOrder
+				var paramsDotPlayersOrderVal GetMultiplayersSummaryPlayersOrder
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -64,18 +64,18 @@ func decodeGetMultiplayersSummaryParams(args [0]string, argsEscaped bool, r *htt
 						return err
 					}
 
-					paramsDotOrderVal = GetMultiplayersSummaryOrder(c)
+					paramsDotPlayersOrderVal = GetMultiplayersSummaryPlayersOrder(c)
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.Order.SetTo(paramsDotOrderVal)
+				params.PlayersOrder.SetTo(paramsDotPlayersOrderVal)
 				return nil
 			}); err != nil {
 				return err
 			}
 			if err := func() error {
-				if value, ok := params.Order.Get(); ok {
+				if value, ok := params.PlayersOrder.Get(); ok {
 					if err := func() error {
 						if err := value.Validate(); err != nil {
 							return err
@@ -93,7 +93,7 @@ func decodeGetMultiplayersSummaryParams(args [0]string, argsEscaped bool, r *htt
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "order",
+			Name: "playersOrder",
 			In:   "query",
 			Err:  err,
 		}
@@ -221,21 +221,23 @@ func decodeGetServerByIDParams(args [2]string, argsEscaped bool, r *http.Request
 	return params, nil
 }
 
-// GetServerStatsByIDParams is parameters of getServerStatsByID operation.
-type GetServerStatsByIDParams struct {
+// GetServerStatisticsByIDParams is parameters of getServerStatisticsByID operation.
+type GetServerStatisticsByIDParams struct {
 	// Name of a multiplayer.
 	MultiplayerName string
 	// ID of a server.
 	ServerID string
 	// Count of return stats.
 	Count OptInt32
-	// Show stats after time.
-	After OptDateTime
+	// Show stats after last seen.
+	LastSeen OptDateTime
 	// Sort order by timestamp.
-	Order OptGetServerStatsByIDOrder
+	TimeOrder OptGetServerStatisticsByIDTimeOrder
+	// Output precision.
+	Precision OptGetServerStatisticsByIDPrecision
 }
 
-func unpackGetServerStatsByIDParams(packed middleware.Parameters) (params GetServerStatsByIDParams) {
+func unpackGetServerStatisticsByIDParams(packed middleware.Parameters) (params GetServerStatisticsByIDParams) {
 	{
 		key := middleware.ParameterKey{
 			Name: "multiplayerName",
@@ -261,26 +263,35 @@ func unpackGetServerStatsByIDParams(packed middleware.Parameters) (params GetSer
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "after",
+			Name: "lastSeen",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.After = v.(OptDateTime)
+			params.LastSeen = v.(OptDateTime)
 		}
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "order",
+			Name: "timeOrder",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
-			params.Order = v.(OptGetServerStatsByIDOrder)
+			params.TimeOrder = v.(OptGetServerStatisticsByIDTimeOrder)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "precision",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.Precision = v.(OptGetServerStatisticsByIDPrecision)
 		}
 	}
 	return params
 }
 
-func decodeGetServerStatsByIDParams(args [2]string, argsEscaped bool, r *http.Request) (params GetServerStatsByIDParams, _ error) {
+func decodeGetServerStatisticsByIDParams(args [2]string, argsEscaped bool, r *http.Request) (params GetServerStatisticsByIDParams, _ error) {
 	q := uri.NewQueryDecoder(r.URL.Query())
 	// Decode path: multiplayerName.
 	if err := func() error {
@@ -413,8 +424,8 @@ func decodeGetServerStatsByIDParams(args [2]string, argsEscaped bool, r *http.Re
 				if value, ok := params.Count.Get(); ok {
 					if err := func() error {
 						if err := (validate.Int{
-							MinSet:        false,
-							Min:           0,
+							MinSet:        true,
+							Min:           1,
 							MaxSet:        true,
 							Max:           720,
 							MinExclusive:  false,
@@ -442,17 +453,17 @@ func decodeGetServerStatsByIDParams(args [2]string, argsEscaped bool, r *http.Re
 			Err:  err,
 		}
 	}
-	// Decode query: after.
+	// Decode query: lastSeen.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "after",
+			Name:    "lastSeen",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotAfterVal time.Time
+				var paramsDotLastSeenVal time.Time
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -464,12 +475,12 @@ func decodeGetServerStatsByIDParams(args [2]string, argsEscaped bool, r *http.Re
 						return err
 					}
 
-					paramsDotAfterVal = c
+					paramsDotLastSeenVal = c
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.After.SetTo(paramsDotAfterVal)
+				params.LastSeen.SetTo(paramsDotLastSeenVal)
 				return nil
 			}); err != nil {
 				return err
@@ -478,27 +489,27 @@ func decodeGetServerStatsByIDParams(args [2]string, argsEscaped bool, r *http.Re
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "after",
+			Name: "lastSeen",
 			In:   "query",
 			Err:  err,
 		}
 	}
-	// Set default value for query: order.
+	// Set default value for query: timeOrder.
 	{
-		val := GetServerStatsByIDOrder("desc")
-		params.Order.SetTo(val)
+		val := GetServerStatisticsByIDTimeOrder("desc")
+		params.TimeOrder.SetTo(val)
 	}
-	// Decode query: order.
+	// Decode query: timeOrder.
 	if err := func() error {
 		cfg := uri.QueryParameterDecodingConfig{
-			Name:    "order",
+			Name:    "timeOrder",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.HasParam(cfg); err == nil {
 			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
-				var paramsDotOrderVal GetServerStatsByIDOrder
+				var paramsDotTimeOrderVal GetServerStatisticsByIDTimeOrder
 				if err := func() error {
 					val, err := d.DecodeValue()
 					if err != nil {
@@ -510,18 +521,18 @@ func decodeGetServerStatsByIDParams(args [2]string, argsEscaped bool, r *http.Re
 						return err
 					}
 
-					paramsDotOrderVal = GetServerStatsByIDOrder(c)
+					paramsDotTimeOrderVal = GetServerStatisticsByIDTimeOrder(c)
 					return nil
 				}(); err != nil {
 					return err
 				}
-				params.Order.SetTo(paramsDotOrderVal)
+				params.TimeOrder.SetTo(paramsDotTimeOrderVal)
 				return nil
 			}); err != nil {
 				return err
 			}
 			if err := func() error {
-				if value, ok := params.Order.Get(); ok {
+				if value, ok := params.TimeOrder.Get(); ok {
 					if err := func() error {
 						if err := value.Validate(); err != nil {
 							return err
@@ -539,7 +550,68 @@ func decodeGetServerStatsByIDParams(args [2]string, argsEscaped bool, r *http.Re
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "order",
+			Name: "timeOrder",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Set default value for query: precision.
+	{
+		val := GetServerStatisticsByIDPrecision("perHour")
+		params.Precision.SetTo(val)
+	}
+	// Decode query: precision.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "precision",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPrecisionVal GetServerStatisticsByIDPrecision
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPrecisionVal = GetServerStatisticsByIDPrecision(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.Precision.SetTo(paramsDotPrecisionVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.Precision.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "precision",
 			In:   "query",
 			Err:  err,
 		}
@@ -551,8 +623,12 @@ func decodeGetServerStatsByIDParams(args [2]string, argsEscaped bool, r *http.Re
 type GetServersByMultiplayerParams struct {
 	// Name of a multiplayer.
 	MultiplayerName string
-	// Count of return objects, -1 for all.
+	// Sort order by players.
+	PlayersOrder OptGetServersByMultiplayerPlayersOrder
+	// Count of return servers, -1 for all.
 	Count OptInt32
+	// Include offline servers or no.
+	IncludeOffline OptBool
 }
 
 func unpackGetServersByMultiplayerParams(packed middleware.Parameters) (params GetServersByMultiplayerParams) {
@@ -565,11 +641,29 @@ func unpackGetServersByMultiplayerParams(packed middleware.Parameters) (params G
 	}
 	{
 		key := middleware.ParameterKey{
+			Name: "playersOrder",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.PlayersOrder = v.(OptGetServersByMultiplayerPlayersOrder)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
 			Name: "count",
 			In:   "query",
 		}
 		if v, ok := packed[key]; ok {
 			params.Count = v.(OptInt32)
+		}
+	}
+	{
+		key := middleware.ParameterKey{
+			Name: "includeOffline",
+			In:   "query",
+		}
+		if v, ok := packed[key]; ok {
+			params.IncludeOffline = v.(OptBool)
 		}
 	}
 	return params
@@ -622,6 +716,67 @@ func decodeGetServersByMultiplayerParams(args [1]string, argsEscaped bool, r *ht
 			Err:  err,
 		}
 	}
+	// Set default value for query: playersOrder.
+	{
+		val := GetServersByMultiplayerPlayersOrder("desc")
+		params.PlayersOrder.SetTo(val)
+	}
+	// Decode query: playersOrder.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "playersOrder",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotPlayersOrderVal GetServersByMultiplayerPlayersOrder
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToString(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotPlayersOrderVal = GetServersByMultiplayerPlayersOrder(c)
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.PlayersOrder.SetTo(paramsDotPlayersOrderVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+			if err := func() error {
+				if value, ok := params.PlayersOrder.Get(); ok {
+					if err := func() error {
+						if err := value.Validate(); err != nil {
+							return err
+						}
+						return nil
+					}(); err != nil {
+						return err
+					}
+				}
+				return nil
+			}(); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "playersOrder",
+			In:   "query",
+			Err:  err,
+		}
+	}
 	// Set default value for query: count.
 	{
 		val := int32(-1)
@@ -664,6 +819,47 @@ func decodeGetServersByMultiplayerParams(args [1]string, argsEscaped bool, r *ht
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
 			Name: "count",
+			In:   "query",
+			Err:  err,
+		}
+	}
+	// Decode query: includeOffline.
+	if err := func() error {
+		cfg := uri.QueryParameterDecodingConfig{
+			Name:    "includeOffline",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.HasParam(cfg); err == nil {
+			if err := q.DecodeParam(cfg, func(d uri.Decoder) error {
+				var paramsDotIncludeOfflineVal bool
+				if err := func() error {
+					val, err := d.DecodeValue()
+					if err != nil {
+						return err
+					}
+
+					c, err := conv.ToBool(val)
+					if err != nil {
+						return err
+					}
+
+					paramsDotIncludeOfflineVal = c
+					return nil
+				}(); err != nil {
+					return err
+				}
+				params.IncludeOffline.SetTo(paramsDotIncludeOfflineVal)
+				return nil
+			}); err != nil {
+				return err
+			}
+		}
+		return nil
+	}(); err != nil {
+		return params, &ogenerrors.DecodeParamError{
+			Name: "includeOffline",
 			In:   "query",
 			Err:  err,
 		}

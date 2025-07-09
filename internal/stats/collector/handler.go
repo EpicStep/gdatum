@@ -1,7 +1,7 @@
 // Copyright 2025 Stepan Rabotkin.
 // SPDX-License-Identifier: Apache-2.0.
 
-package stats
+package collector
 
 import (
 	"context"
@@ -12,20 +12,17 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
 
-	"github.com/EpicStep/gdatum/internal/domain"
-	ragempAdapter "github.com/EpicStep/gdatum/internal/external/adapters/ragemp"
 	ragempClient "github.com/EpicStep/gdatum/internal/external/clients/ragemp"
+	ragempAdapter "github.com/EpicStep/gdatum/internal/stats/adapters/ragemp"
+	"github.com/EpicStep/gdatum/internal/stats/domain"
+	"github.com/EpicStep/gdatum/internal/stats/repository"
 	backoffUtils "github.com/EpicStep/gdatum/internal/utils/backoff"
 )
-
-type repository interface {
-	InsertServers(ctx context.Context, servers []*domain.Server) error
-}
 
 // Handler ...
 type Handler struct {
 	collectors []collectInstance
-	repo       repository
+	repo       repository.Repository
 
 	collectedGauge       *prometheus.GaugeVec
 	collectFailedCounter *prometheus.CounterVec
@@ -35,7 +32,7 @@ type Handler struct {
 }
 
 // New ...
-func New(repo repository, logger *zap.Logger) *Handler {
+func New(repo repository.Repository, logger *zap.Logger) *Handler {
 	if logger == nil {
 		logger = zap.L()
 	}

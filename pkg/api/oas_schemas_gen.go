@@ -8,53 +8,27 @@ import (
 	"github.com/go-faster/errors"
 )
 
-type GetMultiplayersSummaryOKItem struct {
-	// Name of a multiplayer.
-	Name   string `json:"name"`
-	Online int64  `json:"online"`
-}
-
-// GetName returns the value of Name.
-func (s *GetMultiplayersSummaryOKItem) GetName() string {
-	return s.Name
-}
-
-// GetOnline returns the value of Online.
-func (s *GetMultiplayersSummaryOKItem) GetOnline() int64 {
-	return s.Online
-}
-
-// SetName sets the value of Name.
-func (s *GetMultiplayersSummaryOKItem) SetName(val string) {
-	s.Name = val
-}
-
-// SetOnline sets the value of Online.
-func (s *GetMultiplayersSummaryOKItem) SetOnline(val int64) {
-	s.Online = val
-}
-
-type GetMultiplayersSummaryOrder string
+type GetMultiplayersSummaryPlayersOrder string
 
 const (
-	GetMultiplayersSummaryOrderAsc  GetMultiplayersSummaryOrder = "asc"
-	GetMultiplayersSummaryOrderDesc GetMultiplayersSummaryOrder = "desc"
+	GetMultiplayersSummaryPlayersOrderAsc  GetMultiplayersSummaryPlayersOrder = "asc"
+	GetMultiplayersSummaryPlayersOrderDesc GetMultiplayersSummaryPlayersOrder = "desc"
 )
 
-// AllValues returns all GetMultiplayersSummaryOrder values.
-func (GetMultiplayersSummaryOrder) AllValues() []GetMultiplayersSummaryOrder {
-	return []GetMultiplayersSummaryOrder{
-		GetMultiplayersSummaryOrderAsc,
-		GetMultiplayersSummaryOrderDesc,
+// AllValues returns all GetMultiplayersSummaryPlayersOrder values.
+func (GetMultiplayersSummaryPlayersOrder) AllValues() []GetMultiplayersSummaryPlayersOrder {
+	return []GetMultiplayersSummaryPlayersOrder{
+		GetMultiplayersSummaryPlayersOrderAsc,
+		GetMultiplayersSummaryPlayersOrderDesc,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s GetMultiplayersSummaryOrder) MarshalText() ([]byte, error) {
+func (s GetMultiplayersSummaryPlayersOrder) MarshalText() ([]byte, error) {
 	switch s {
-	case GetMultiplayersSummaryOrderAsc:
+	case GetMultiplayersSummaryPlayersOrderAsc:
 		return []byte(s), nil
-	case GetMultiplayersSummaryOrderDesc:
+	case GetMultiplayersSummaryPlayersOrderDesc:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -62,13 +36,13 @@ func (s GetMultiplayersSummaryOrder) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *GetMultiplayersSummaryOrder) UnmarshalText(data []byte) error {
-	switch GetMultiplayersSummaryOrder(data) {
-	case GetMultiplayersSummaryOrderAsc:
-		*s = GetMultiplayersSummaryOrderAsc
+func (s *GetMultiplayersSummaryPlayersOrder) UnmarshalText(data []byte) error {
+	switch GetMultiplayersSummaryPlayersOrder(data) {
+	case GetMultiplayersSummaryPlayersOrderAsc:
+		*s = GetMultiplayersSummaryPlayersOrderAsc
 		return nil
-	case GetMultiplayersSummaryOrderDesc:
-		*s = GetMultiplayersSummaryOrderDesc
+	case GetMultiplayersSummaryPlayersOrderDesc:
+		*s = GetMultiplayersSummaryPlayersOrderDesc
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -81,10 +55,12 @@ type GetServerByIDNotFound struct{}
 func (*GetServerByIDNotFound) getServerByIDRes() {}
 
 type GetServerByIDOK struct {
-	Name     string    `json:"name"`
-	URL      OptString `json:"url"`
-	Gamemode OptString `json:"gamemode"`
-	Lang     OptString `json:"lang"`
+	Name        string      `json:"name"`
+	URL         OptString   `json:"url"`
+	Gamemode    OptString   `json:"gamemode"`
+	Lang        OptString   `json:"lang"`
+	Players     OptInt64    `json:"players"`
+	CollectedAt OptDateTime `json:"collected_at"`
 }
 
 // GetName returns the value of Name.
@@ -107,6 +83,16 @@ func (s *GetServerByIDOK) GetLang() OptString {
 	return s.Lang
 }
 
+// GetPlayers returns the value of Players.
+func (s *GetServerByIDOK) GetPlayers() OptInt64 {
+	return s.Players
+}
+
+// GetCollectedAt returns the value of CollectedAt.
+func (s *GetServerByIDOK) GetCollectedAt() OptDateTime {
+	return s.CollectedAt
+}
+
 // SetName sets the value of Name.
 func (s *GetServerByIDOK) SetName(val string) {
 	s.Name = val
@@ -127,63 +113,48 @@ func (s *GetServerByIDOK) SetLang(val OptString) {
 	s.Lang = val
 }
 
+// SetPlayers sets the value of Players.
+func (s *GetServerByIDOK) SetPlayers(val OptInt64) {
+	s.Players = val
+}
+
+// SetCollectedAt sets the value of CollectedAt.
+func (s *GetServerByIDOK) SetCollectedAt(val OptDateTime) {
+	s.CollectedAt = val
+}
+
 func (*GetServerByIDOK) getServerByIDRes() {}
 
-// GetServerStatsByIDNotFound is response for GetServerStatsByID operation.
-type GetServerStatsByIDNotFound struct{}
+// GetServerStatisticsByIDNotFound is response for GetServerStatisticsByID operation.
+type GetServerStatisticsByIDNotFound struct{}
 
-func (*GetServerStatsByIDNotFound) getServerStatsByIDRes() {}
+func (*GetServerStatisticsByIDNotFound) getServerStatisticsByIDRes() {}
 
-type GetServerStatsByIDOKApplicationJSON []GetServerStatsByIDOKItem
+type GetServerStatisticsByIDOKApplicationJSON []ServerStatistic
 
-func (*GetServerStatsByIDOKApplicationJSON) getServerStatsByIDRes() {}
+func (*GetServerStatisticsByIDOKApplicationJSON) getServerStatisticsByIDRes() {}
 
-type GetServerStatsByIDOKItem struct {
-	Timestamp time.Time `json:"timestamp"`
-	Online    int32     `json:"online"`
-}
-
-// GetTimestamp returns the value of Timestamp.
-func (s *GetServerStatsByIDOKItem) GetTimestamp() time.Time {
-	return s.Timestamp
-}
-
-// GetOnline returns the value of Online.
-func (s *GetServerStatsByIDOKItem) GetOnline() int32 {
-	return s.Online
-}
-
-// SetTimestamp sets the value of Timestamp.
-func (s *GetServerStatsByIDOKItem) SetTimestamp(val time.Time) {
-	s.Timestamp = val
-}
-
-// SetOnline sets the value of Online.
-func (s *GetServerStatsByIDOKItem) SetOnline(val int32) {
-	s.Online = val
-}
-
-type GetServerStatsByIDOrder string
+type GetServerStatisticsByIDPrecision string
 
 const (
-	GetServerStatsByIDOrderAsc  GetServerStatsByIDOrder = "asc"
-	GetServerStatsByIDOrderDesc GetServerStatsByIDOrder = "desc"
+	GetServerStatisticsByIDPrecisionPerHour GetServerStatisticsByIDPrecision = "perHour"
+	GetServerStatisticsByIDPrecisionPerDay  GetServerStatisticsByIDPrecision = "perDay"
 )
 
-// AllValues returns all GetServerStatsByIDOrder values.
-func (GetServerStatsByIDOrder) AllValues() []GetServerStatsByIDOrder {
-	return []GetServerStatsByIDOrder{
-		GetServerStatsByIDOrderAsc,
-		GetServerStatsByIDOrderDesc,
+// AllValues returns all GetServerStatisticsByIDPrecision values.
+func (GetServerStatisticsByIDPrecision) AllValues() []GetServerStatisticsByIDPrecision {
+	return []GetServerStatisticsByIDPrecision{
+		GetServerStatisticsByIDPrecisionPerHour,
+		GetServerStatisticsByIDPrecisionPerDay,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s GetServerStatsByIDOrder) MarshalText() ([]byte, error) {
+func (s GetServerStatisticsByIDPrecision) MarshalText() ([]byte, error) {
 	switch s {
-	case GetServerStatsByIDOrderAsc:
+	case GetServerStatisticsByIDPrecisionPerHour:
 		return []byte(s), nil
-	case GetServerStatsByIDOrderDesc:
+	case GetServerStatisticsByIDPrecisionPerDay:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -191,13 +162,54 @@ func (s GetServerStatsByIDOrder) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *GetServerStatsByIDOrder) UnmarshalText(data []byte) error {
-	switch GetServerStatsByIDOrder(data) {
-	case GetServerStatsByIDOrderAsc:
-		*s = GetServerStatsByIDOrderAsc
+func (s *GetServerStatisticsByIDPrecision) UnmarshalText(data []byte) error {
+	switch GetServerStatisticsByIDPrecision(data) {
+	case GetServerStatisticsByIDPrecisionPerHour:
+		*s = GetServerStatisticsByIDPrecisionPerHour
 		return nil
-	case GetServerStatsByIDOrderDesc:
-		*s = GetServerStatsByIDOrderDesc
+	case GetServerStatisticsByIDPrecisionPerDay:
+		*s = GetServerStatisticsByIDPrecisionPerDay
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+type GetServerStatisticsByIDTimeOrder string
+
+const (
+	GetServerStatisticsByIDTimeOrderAsc  GetServerStatisticsByIDTimeOrder = "asc"
+	GetServerStatisticsByIDTimeOrderDesc GetServerStatisticsByIDTimeOrder = "desc"
+)
+
+// AllValues returns all GetServerStatisticsByIDTimeOrder values.
+func (GetServerStatisticsByIDTimeOrder) AllValues() []GetServerStatisticsByIDTimeOrder {
+	return []GetServerStatisticsByIDTimeOrder{
+		GetServerStatisticsByIDTimeOrderAsc,
+		GetServerStatisticsByIDTimeOrderDesc,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetServerStatisticsByIDTimeOrder) MarshalText() ([]byte, error) {
+	switch s {
+	case GetServerStatisticsByIDTimeOrderAsc:
+		return []byte(s), nil
+	case GetServerStatisticsByIDTimeOrderDesc:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetServerStatisticsByIDTimeOrder) UnmarshalText(data []byte) error {
+	switch GetServerStatisticsByIDTimeOrder(data) {
+	case GetServerStatisticsByIDTimeOrderAsc:
+		*s = GetServerStatisticsByIDTimeOrderAsc
+		return nil
+	case GetServerStatisticsByIDTimeOrderDesc:
+		*s = GetServerStatisticsByIDTimeOrderDesc
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
@@ -209,33 +221,122 @@ type GetServersByMultiplayerNotFound struct{}
 
 func (*GetServersByMultiplayerNotFound) getServersByMultiplayerRes() {}
 
-type GetServersByMultiplayerOKApplicationJSON []GetServersByMultiplayerOKItem
+type GetServersByMultiplayerOKApplicationJSON []ServerSummary
 
 func (*GetServersByMultiplayerOKApplicationJSON) getServersByMultiplayerRes() {}
 
-type GetServersByMultiplayerOKItem struct {
-	Name   string `json:"name"`
-	Online int32  `json:"online"`
+type GetServersByMultiplayerPlayersOrder string
+
+const (
+	GetServersByMultiplayerPlayersOrderAsc  GetServersByMultiplayerPlayersOrder = "asc"
+	GetServersByMultiplayerPlayersOrderDesc GetServersByMultiplayerPlayersOrder = "desc"
+)
+
+// AllValues returns all GetServersByMultiplayerPlayersOrder values.
+func (GetServersByMultiplayerPlayersOrder) AllValues() []GetServersByMultiplayerPlayersOrder {
+	return []GetServersByMultiplayerPlayersOrder{
+		GetServersByMultiplayerPlayersOrderAsc,
+		GetServersByMultiplayerPlayersOrderDesc,
+	}
+}
+
+// MarshalText implements encoding.TextMarshaler.
+func (s GetServersByMultiplayerPlayersOrder) MarshalText() ([]byte, error) {
+	switch s {
+	case GetServersByMultiplayerPlayersOrderAsc:
+		return []byte(s), nil
+	case GetServersByMultiplayerPlayersOrderDesc:
+		return []byte(s), nil
+	default:
+		return nil, errors.Errorf("invalid value: %q", s)
+	}
+}
+
+// UnmarshalText implements encoding.TextUnmarshaler.
+func (s *GetServersByMultiplayerPlayersOrder) UnmarshalText(data []byte) error {
+	switch GetServersByMultiplayerPlayersOrder(data) {
+	case GetServersByMultiplayerPlayersOrderAsc:
+		*s = GetServersByMultiplayerPlayersOrderAsc
+		return nil
+	case GetServersByMultiplayerPlayersOrderDesc:
+		*s = GetServersByMultiplayerPlayersOrderDesc
+		return nil
+	default:
+		return errors.Errorf("invalid value: %q", data)
+	}
+}
+
+// Ref: #/components/schemas/MultiplayerSummary
+type MultiplayerSummary struct {
+	// Name of a multiplayer.
+	Name    string `json:"name"`
+	Players int64  `json:"players"`
 }
 
 // GetName returns the value of Name.
-func (s *GetServersByMultiplayerOKItem) GetName() string {
+func (s *MultiplayerSummary) GetName() string {
 	return s.Name
 }
 
-// GetOnline returns the value of Online.
-func (s *GetServersByMultiplayerOKItem) GetOnline() int32 {
-	return s.Online
+// GetPlayers returns the value of Players.
+func (s *MultiplayerSummary) GetPlayers() int64 {
+	return s.Players
 }
 
 // SetName sets the value of Name.
-func (s *GetServersByMultiplayerOKItem) SetName(val string) {
+func (s *MultiplayerSummary) SetName(val string) {
 	s.Name = val
 }
 
-// SetOnline sets the value of Online.
-func (s *GetServersByMultiplayerOKItem) SetOnline(val int32) {
-	s.Online = val
+// SetPlayers sets the value of Players.
+func (s *MultiplayerSummary) SetPlayers(val int64) {
+	s.Players = val
+}
+
+// NewOptBool returns new OptBool with value set to v.
+func NewOptBool(v bool) OptBool {
+	return OptBool{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptBool is optional bool.
+type OptBool struct {
+	Value bool
+	Set   bool
+}
+
+// IsSet returns true if OptBool was set.
+func (o OptBool) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptBool) Reset() {
+	var v bool
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptBool) SetTo(v bool) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptBool) Get() (v bool, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptBool) Or(d bool) bool {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
 }
 
 // NewOptDateTime returns new OptDateTime with value set to v.
@@ -284,38 +385,38 @@ func (o OptDateTime) Or(d time.Time) time.Time {
 	return d
 }
 
-// NewOptGetMultiplayersSummaryOrder returns new OptGetMultiplayersSummaryOrder with value set to v.
-func NewOptGetMultiplayersSummaryOrder(v GetMultiplayersSummaryOrder) OptGetMultiplayersSummaryOrder {
-	return OptGetMultiplayersSummaryOrder{
+// NewOptGetMultiplayersSummaryPlayersOrder returns new OptGetMultiplayersSummaryPlayersOrder with value set to v.
+func NewOptGetMultiplayersSummaryPlayersOrder(v GetMultiplayersSummaryPlayersOrder) OptGetMultiplayersSummaryPlayersOrder {
+	return OptGetMultiplayersSummaryPlayersOrder{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptGetMultiplayersSummaryOrder is optional GetMultiplayersSummaryOrder.
-type OptGetMultiplayersSummaryOrder struct {
-	Value GetMultiplayersSummaryOrder
+// OptGetMultiplayersSummaryPlayersOrder is optional GetMultiplayersSummaryPlayersOrder.
+type OptGetMultiplayersSummaryPlayersOrder struct {
+	Value GetMultiplayersSummaryPlayersOrder
 	Set   bool
 }
 
-// IsSet returns true if OptGetMultiplayersSummaryOrder was set.
-func (o OptGetMultiplayersSummaryOrder) IsSet() bool { return o.Set }
+// IsSet returns true if OptGetMultiplayersSummaryPlayersOrder was set.
+func (o OptGetMultiplayersSummaryPlayersOrder) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptGetMultiplayersSummaryOrder) Reset() {
-	var v GetMultiplayersSummaryOrder
+func (o *OptGetMultiplayersSummaryPlayersOrder) Reset() {
+	var v GetMultiplayersSummaryPlayersOrder
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptGetMultiplayersSummaryOrder) SetTo(v GetMultiplayersSummaryOrder) {
+func (o *OptGetMultiplayersSummaryPlayersOrder) SetTo(v GetMultiplayersSummaryPlayersOrder) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptGetMultiplayersSummaryOrder) Get() (v GetMultiplayersSummaryOrder, ok bool) {
+func (o OptGetMultiplayersSummaryPlayersOrder) Get() (v GetMultiplayersSummaryPlayersOrder, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -323,45 +424,45 @@ func (o OptGetMultiplayersSummaryOrder) Get() (v GetMultiplayersSummaryOrder, ok
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptGetMultiplayersSummaryOrder) Or(d GetMultiplayersSummaryOrder) GetMultiplayersSummaryOrder {
+func (o OptGetMultiplayersSummaryPlayersOrder) Or(d GetMultiplayersSummaryPlayersOrder) GetMultiplayersSummaryPlayersOrder {
 	if v, ok := o.Get(); ok {
 		return v
 	}
 	return d
 }
 
-// NewOptGetServerStatsByIDOrder returns new OptGetServerStatsByIDOrder with value set to v.
-func NewOptGetServerStatsByIDOrder(v GetServerStatsByIDOrder) OptGetServerStatsByIDOrder {
-	return OptGetServerStatsByIDOrder{
+// NewOptGetServerStatisticsByIDPrecision returns new OptGetServerStatisticsByIDPrecision with value set to v.
+func NewOptGetServerStatisticsByIDPrecision(v GetServerStatisticsByIDPrecision) OptGetServerStatisticsByIDPrecision {
+	return OptGetServerStatisticsByIDPrecision{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptGetServerStatsByIDOrder is optional GetServerStatsByIDOrder.
-type OptGetServerStatsByIDOrder struct {
-	Value GetServerStatsByIDOrder
+// OptGetServerStatisticsByIDPrecision is optional GetServerStatisticsByIDPrecision.
+type OptGetServerStatisticsByIDPrecision struct {
+	Value GetServerStatisticsByIDPrecision
 	Set   bool
 }
 
-// IsSet returns true if OptGetServerStatsByIDOrder was set.
-func (o OptGetServerStatsByIDOrder) IsSet() bool { return o.Set }
+// IsSet returns true if OptGetServerStatisticsByIDPrecision was set.
+func (o OptGetServerStatisticsByIDPrecision) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptGetServerStatsByIDOrder) Reset() {
-	var v GetServerStatsByIDOrder
+func (o *OptGetServerStatisticsByIDPrecision) Reset() {
+	var v GetServerStatisticsByIDPrecision
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptGetServerStatsByIDOrder) SetTo(v GetServerStatsByIDOrder) {
+func (o *OptGetServerStatisticsByIDPrecision) SetTo(v GetServerStatisticsByIDPrecision) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptGetServerStatsByIDOrder) Get() (v GetServerStatsByIDOrder, ok bool) {
+func (o OptGetServerStatisticsByIDPrecision) Get() (v GetServerStatisticsByIDPrecision, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -369,7 +470,99 @@ func (o OptGetServerStatsByIDOrder) Get() (v GetServerStatsByIDOrder, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptGetServerStatsByIDOrder) Or(d GetServerStatsByIDOrder) GetServerStatsByIDOrder {
+func (o OptGetServerStatisticsByIDPrecision) Or(d GetServerStatisticsByIDPrecision) GetServerStatisticsByIDPrecision {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetServerStatisticsByIDTimeOrder returns new OptGetServerStatisticsByIDTimeOrder with value set to v.
+func NewOptGetServerStatisticsByIDTimeOrder(v GetServerStatisticsByIDTimeOrder) OptGetServerStatisticsByIDTimeOrder {
+	return OptGetServerStatisticsByIDTimeOrder{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetServerStatisticsByIDTimeOrder is optional GetServerStatisticsByIDTimeOrder.
+type OptGetServerStatisticsByIDTimeOrder struct {
+	Value GetServerStatisticsByIDTimeOrder
+	Set   bool
+}
+
+// IsSet returns true if OptGetServerStatisticsByIDTimeOrder was set.
+func (o OptGetServerStatisticsByIDTimeOrder) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetServerStatisticsByIDTimeOrder) Reset() {
+	var v GetServerStatisticsByIDTimeOrder
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetServerStatisticsByIDTimeOrder) SetTo(v GetServerStatisticsByIDTimeOrder) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetServerStatisticsByIDTimeOrder) Get() (v GetServerStatisticsByIDTimeOrder, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetServerStatisticsByIDTimeOrder) Or(d GetServerStatisticsByIDTimeOrder) GetServerStatisticsByIDTimeOrder {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
+// NewOptGetServersByMultiplayerPlayersOrder returns new OptGetServersByMultiplayerPlayersOrder with value set to v.
+func NewOptGetServersByMultiplayerPlayersOrder(v GetServersByMultiplayerPlayersOrder) OptGetServersByMultiplayerPlayersOrder {
+	return OptGetServersByMultiplayerPlayersOrder{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptGetServersByMultiplayerPlayersOrder is optional GetServersByMultiplayerPlayersOrder.
+type OptGetServersByMultiplayerPlayersOrder struct {
+	Value GetServersByMultiplayerPlayersOrder
+	Set   bool
+}
+
+// IsSet returns true if OptGetServersByMultiplayerPlayersOrder was set.
+func (o OptGetServersByMultiplayerPlayersOrder) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptGetServersByMultiplayerPlayersOrder) Reset() {
+	var v GetServersByMultiplayerPlayersOrder
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptGetServersByMultiplayerPlayersOrder) SetTo(v GetServersByMultiplayerPlayersOrder) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptGetServersByMultiplayerPlayersOrder) Get() (v GetServersByMultiplayerPlayersOrder, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptGetServersByMultiplayerPlayersOrder) Or(d GetServersByMultiplayerPlayersOrder) GetServersByMultiplayerPlayersOrder {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -422,6 +615,52 @@ func (o OptInt32) Or(d int32) int32 {
 	return d
 }
 
+// NewOptInt64 returns new OptInt64 with value set to v.
+func NewOptInt64(v int64) OptInt64 {
+	return OptInt64{
+		Value: v,
+		Set:   true,
+	}
+}
+
+// OptInt64 is optional int64.
+type OptInt64 struct {
+	Value int64
+	Set   bool
+}
+
+// IsSet returns true if OptInt64 was set.
+func (o OptInt64) IsSet() bool { return o.Set }
+
+// Reset unsets value.
+func (o *OptInt64) Reset() {
+	var v int64
+	o.Value = v
+	o.Set = false
+}
+
+// SetTo sets value to v.
+func (o *OptInt64) SetTo(v int64) {
+	o.Set = true
+	o.Value = v
+}
+
+// Get returns value and boolean that denotes whether value was set.
+func (o OptInt64) Get() (v int64, ok bool) {
+	if !o.Set {
+		return v, false
+	}
+	return o.Value, true
+}
+
+// Or returns value if set, or given parameter if does not.
+func (o OptInt64) Or(d int64) int64 {
+	if v, ok := o.Get(); ok {
+		return v
+	}
+	return d
+}
+
 // NewOptString returns new OptString with value set to v.
 func NewOptString(v string) OptString {
 	return OptString{
@@ -466,4 +705,67 @@ func (o OptString) Or(d string) string {
 		return v
 	}
 	return d
+}
+
+// Ref: #/components/schemas/ServerStatistic
+type ServerStatistic struct {
+	Timestamp time.Time `json:"timestamp"`
+	Players   int32     `json:"players"`
+}
+
+// GetTimestamp returns the value of Timestamp.
+func (s *ServerStatistic) GetTimestamp() time.Time {
+	return s.Timestamp
+}
+
+// GetPlayers returns the value of Players.
+func (s *ServerStatistic) GetPlayers() int32 {
+	return s.Players
+}
+
+// SetTimestamp sets the value of Timestamp.
+func (s *ServerStatistic) SetTimestamp(val time.Time) {
+	s.Timestamp = val
+}
+
+// SetPlayers sets the value of Players.
+func (s *ServerStatistic) SetPlayers(val int32) {
+	s.Players = val
+}
+
+// Ref: #/components/schemas/ServerSummary
+type ServerSummary struct {
+	ID      string `json:"id"`
+	Name    string `json:"name"`
+	Players int32  `json:"players"`
+}
+
+// GetID returns the value of ID.
+func (s *ServerSummary) GetID() string {
+	return s.ID
+}
+
+// GetName returns the value of Name.
+func (s *ServerSummary) GetName() string {
+	return s.Name
+}
+
+// GetPlayers returns the value of Players.
+func (s *ServerSummary) GetPlayers() int32 {
+	return s.Players
+}
+
+// SetID sets the value of ID.
+func (s *ServerSummary) SetID(val string) {
+	s.ID = val
+}
+
+// SetName sets the value of Name.
+func (s *ServerSummary) SetName(val string) {
+	s.Name = val
+}
+
+// SetPlayers sets the value of Players.
+func (s *ServerSummary) SetPlayers(val int32) {
+	s.Players = val
 }

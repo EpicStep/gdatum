@@ -8,6 +8,6 @@ type OperationName = string
 const (
 	GetMultiplayersSummaryOperation  OperationName = "GetMultiplayersSummary"
 	GetServerByIDOperation           OperationName = "GetServerByID"
-	GetServerStatsByIDOperation      OperationName = "GetServerStatsByID"
+	GetServerStatisticsByIDOperation OperationName = "GetServerStatisticsByID"
 	GetServersByMultiplayerOperation OperationName = "GetServersByMultiplayer"
 )

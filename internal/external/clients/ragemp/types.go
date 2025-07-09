@@ -12,5 +12,5 @@ type Server struct {
 	Gamemode string `json:"gamemode"`
 	URL      string `json:"url"`
 	Lang     string `json:"lang"`
-	Players  uint   `json:"players"`
+	Players  int32  `json:"players"`
 }

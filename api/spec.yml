@@ -3,7 +3,8 @@ info:
   version: 1.0.0
   title: Gdatum API
 servers:
-  - url: /v1
+  - url: 127.0.0.1:8080
+    description: Local
 tags:
   - name: monitoring
     description: Monitoring of game servers
@@ -15,9 +16,9 @@ paths:
       summary: Get multiplayers summary
       operationId: getMultiplayersSummary
       parameters:
-        - name: order
+        - name: playersOrder
           in: query
-          description: Sort order by online
+          description: Sort order by current players
           schema:
             type: string
             default: desc
@@ -26,23 +27,7 @@ paths:
               - desc
       responses:
         '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - name
-                    - online
-                  properties:
-                    name:
-                      type: string
-                      description: Name of a multiplayer
-                    online:
-                      type: integer
-                      format: int64
+          $ref: "responses.yml#/components/responses/GetMultiplayersSummaryOK"
   '/multiplayer/{multiplayerName}/servers':
     get:
       tags:
@@ -56,31 +41,31 @@ paths:
           required: true
           schema:
             type: string
+        - name: playersOrder
+          in: query
+          description: Sort order by players
+          schema:
+            type: string
+            default: desc
+            enum:
+              - asc
+              - desc
         - name: count
           in: query
-          description: Count of return objects, -1 for all
+          description: Count of return servers, -1 for all
           schema:
             type: integer
             format: int32
             default: -1
+            minimum: -1
+        - name: includeOffline
+          in: query
+          description: Include offline servers or no.
+          schema:
+            type: boolean
       responses:
         '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - name
-                    - online
-                  properties:
-                    name:
-                      type: string
-                    online:
-                      type: integer
-                      format: int32
+          $ref: "responses.yml#/components/responses/GetServersByMultiplayerOK"
         '404':
           description: Multiplayer not found
   '/multiplayer/{multiplayerName}/server/{serverID}':
@@ -104,30 +89,15 @@ paths:
             type: string
       responses:
         '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: object
-                required:
-                  - name
-                properties:
-                  name:
-                    type: string
-                  url:
-                    type: string
-                  gamemode:
-                    type: string
-                  lang:
-                    type: string
+          $ref: "responses.yml#/components/responses/GetServerByIDOK"
         '404':
           description: Server not found
-  '/multiplayer/{multiplayerName}/server/{serverID}/stats':
+  '/multiplayer/{multiplayerName}/server/{serverID}/statistics':
     get:
       tags:
         - monitoring
       summary: Get server stats by ID
-      operationId: getServerStatsByID
+      operationId: getServerStatisticsByID
       parameters:
         - name: multiplayerName
           in: path
@@ -148,14 +118,15 @@ paths:
             type: integer
             format: int32
             default: 720
+            minimum: 1
             maximum: 720
-        - name: after
+        - name: lastSeen
           in: query
-          description: Show stats after time
+          description: Show stats after last seen
           schema:
             type: string
             format: date-time
-        - name: order
+        - name: timeOrder
           in: query
           description: Sort order by timestamp
           schema:
@@ -164,24 +135,17 @@ paths:
             enum:
               - asc
               - desc
+        - name: precision
+          in: query
+          description: Output precision
+          schema:
+            type: string
+            default: perHour
+            enum:
+              - perHour
+              - perDay
       responses:
         '200':
-          description: successful operation
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  required:
-                    - timestamp
-                    - online
-                  properties:
-                    timestamp:
-                      type: string
-                      format: date-time
-                    online:
-                      type: integer
-                      format: int32
+          $ref: "responses.yml#/components/responses/GetServerStatisticsByID"
         '404':
           description: Server not found

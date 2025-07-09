@@ -11,7 +11,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/ClickHouse/clickhouse-go/v2"
+	clickhouseGo "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
@@ -20,8 +20,9 @@ import (
 	"github.com/EpicStep/gdatum/internal/config"
 	"github.com/EpicStep/gdatum/internal/handlers/admin"
 	apiHandler "github.com/EpicStep/gdatum/internal/handlers/api"
-	"github.com/EpicStep/gdatum/internal/repository"
-	"github.com/EpicStep/gdatum/internal/stats"
+	clickhouseAdapter "github.com/EpicStep/gdatum/internal/stats/adapters/clickhouse"
+	"github.com/EpicStep/gdatum/internal/stats/collector"
+	clickhouseRepository "github.com/EpicStep/gdatum/internal/stats/repository/clickhouse"
 	"github.com/EpicStep/gdatum/internal/utils/migrations"
 	"github.com/EpicStep/gdatum/internal/utils/server"
 	"github.com/EpicStep/gdatum/internal/worker"
@@ -70,12 +71,12 @@ func run(logger *zap.Logger) error {
 		return fmt.Errorf("openDB: %w", err)
 	}
 
-	repo := repository.New(db)
+	repo := clickhouseAdapter.New(clickhouseRepository.New(db))
 
-	statsHandler := stats.New(repo, logger)
+	statsHandler := collector.New(repo, logger)
 	statsCollectorWorker := worker.New("stats-collector", time.Hour, statsHandler.Handle, logger)
 
-	apiServer, err := api.NewServer(apiHandler.New())
+	apiServer, err := api.NewServer(apiHandler.New(repo))
 	if err != nil {
 		return fmt.Errorf("api.NewServer: %w", err)
 	}
@@ -102,12 +103,12 @@ func run(logger *zap.Logger) error {
 }
 
 func openDB(dsn string) (driver.Conn, error) {
-	dbOpts, err := clickhouse.ParseDSN(dsn)
+	dbOpts, err := clickhouseGo.ParseDSN(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("clickhouse.ParseDSN: %w", err)
 	}
 
-	db, err := clickhouse.Open(dbOpts)
+	db, err := clickhouseGo.Open(dbOpts)
 	if err != nil {
 		return nil, fmt.Errorf("clickhouse.Open: %w", err)
 	}

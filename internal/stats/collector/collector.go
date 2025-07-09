@@ -1,7 +1,7 @@
 // Copyright 2025 Stepan Rabotkin.
 // SPDX-License-Identifier: Apache-2.0.
 
-package stats
+package collector
 
 import (
 	"context"
@@ -11,22 +11,22 @@ import (
 	"github.com/cenkalti/backoff/v5"
 	"go.uber.org/zap"
 
-	"github.com/EpicStep/gdatum/internal/domain"
+	"github.com/EpicStep/gdatum/internal/stats/domain"
 )
 
-type collectFunc func(ctx context.Context, collectedAt time.Time) ([]*domain.Server, error)
+type collectFunc func(ctx context.Context, collectedAt time.Time) ([]domain.Server, error)
 
 type collectInstance struct {
 	Multiplayer domain.Multiplayer
 	Collect     collectFunc
 }
 
-func (h *Handler) collect(ctx context.Context) []*domain.Server {
+func (h *Handler) collect(ctx context.Context) []domain.Server {
 	collectedAt := time.Now().Truncate(time.Hour)
 
 	var wg sync.WaitGroup
 
-	var result []*domain.Server
+	var result []domain.Server
 	var resultMux sync.Mutex
 
 	for _, collector := range h.collectors {
@@ -38,7 +38,7 @@ func (h *Handler) collect(ctx context.Context) []*domain.Server {
 
 			collectedServers, err := backoff.Retry(
 				ctx,
-				func() ([]*domain.Server, error) {
+				func() ([]domain.Server, error) {
 					collectedServers, err := collector.Collect(ctx, collectedAt)
 					if err != nil {
 						attempt++

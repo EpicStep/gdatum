@@ -33,19 +33,19 @@ type Invoker interface {
 	// Get multiplayers summary.
 	//
 	// GET /multiplayers/summary
-	GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) ([]GetMultiplayersSummaryOKItem, error)
+	GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) ([]MultiplayerSummary, error)
 	// GetServerByID invokes getServerByID operation.
 	//
 	// Get server by ID.
 	//
 	// GET /multiplayer/{multiplayerName}/server/{serverID}
 	GetServerByID(ctx context.Context, params GetServerByIDParams) (GetServerByIDRes, error)
-	// GetServerStatsByID invokes getServerStatsByID operation.
+	// GetServerStatisticsByID invokes getServerStatisticsByID operation.
 	//
 	// Get server stats by ID.
 	//
-	// GET /multiplayer/{multiplayerName}/server/{serverID}/stats
-	GetServerStatsByID(ctx context.Context, params GetServerStatsByIDParams) (GetServerStatsByIDRes, error)
+	// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+	GetServerStatisticsByID(ctx context.Context, params GetServerStatisticsByIDParams) (GetServerStatisticsByIDRes, error)
 	// GetServersByMultiplayer invokes getServersByMultiplayer operation.
 	//
 	// Get servers by multiplayer.
@@ -102,12 +102,12 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 // Get multiplayers summary.
 //
 // GET /multiplayers/summary
-func (c *Client) GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) ([]GetMultiplayersSummaryOKItem, error) {
+func (c *Client) GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) ([]MultiplayerSummary, error) {
 	res, err := c.sendGetMultiplayersSummary(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) (res []GetMultiplayersSummaryOKItem, err error) {
+func (c *Client) sendGetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) (res []MultiplayerSummary, err error) {
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getMultiplayersSummary"),
 		semconv.HTTPRequestMethodKey.String("GET"),
@@ -150,15 +150,15 @@ func (c *Client) sendGetMultiplayersSummary(ctx context.Context, params GetMulti
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
 	{
-		// Encode "order" parameter.
+		// Encode "playersOrder" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "order",
+			Name:    "playersOrder",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Order.Get(); ok {
+			if val, ok := params.PlayersOrder.Get(); ok {
 				return e.EncodeValue(conv.StringToString(string(val)))
 			}
 			return nil
@@ -299,21 +299,21 @@ func (c *Client) sendGetServerByID(ctx context.Context, params GetServerByIDPara
 	return result, nil
 }
 
-// GetServerStatsByID invokes getServerStatsByID operation.
+// GetServerStatisticsByID invokes getServerStatisticsByID operation.
 //
 // Get server stats by ID.
 //
-// GET /multiplayer/{multiplayerName}/server/{serverID}/stats
-func (c *Client) GetServerStatsByID(ctx context.Context, params GetServerStatsByIDParams) (GetServerStatsByIDRes, error) {
-	res, err := c.sendGetServerStatsByID(ctx, params)
+// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+func (c *Client) GetServerStatisticsByID(ctx context.Context, params GetServerStatisticsByIDParams) (GetServerStatisticsByIDRes, error) {
+	res, err := c.sendGetServerStatisticsByID(ctx, params)
 	return res, err
 }
 
-func (c *Client) sendGetServerStatsByID(ctx context.Context, params GetServerStatsByIDParams) (res GetServerStatsByIDRes, err error) {
+func (c *Client) sendGetServerStatisticsByID(ctx context.Context, params GetServerStatisticsByIDParams) (res GetServerStatisticsByIDRes, err error) {
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("getServerStatsByID"),
+		otelogen.OperationID("getServerStatisticsByID"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/multiplayer/{multiplayerName}/server/{serverID}/stats"),
+		semconv.HTTPRouteKey.String("/multiplayer/{multiplayerName}/server/{serverID}/statistics"),
 	}
 
 	// Run stopwatch.
@@ -328,7 +328,7 @@ func (c *Client) sendGetServerStatsByID(ctx context.Context, params GetServerSta
 	c.requests.Add(ctx, 1, metric.WithAttributes(otelAttrs...))
 
 	// Start a span for this request.
-	ctx, span := c.cfg.Tracer.Start(ctx, GetServerStatsByIDOperation,
+	ctx, span := c.cfg.Tracer.Start(ctx, GetServerStatisticsByIDOperation,
 		trace.WithAttributes(otelAttrs...),
 		clientSpanKind,
 	)
@@ -384,7 +384,7 @@ func (c *Client) sendGetServerStatsByID(ctx context.Context, params GetServerSta
 		}
 		pathParts[3] = encoded
 	}
-	pathParts[4] = "/stats"
+	pathParts[4] = "/statistics"
 	uri.AddPathParts(u, pathParts[:]...)
 
 	stage = "EncodeQueryParams"
@@ -407,15 +407,15 @@ func (c *Client) sendGetServerStatsByID(ctx context.Context, params GetServerSta
 		}
 	}
 	{
-		// Encode "after" parameter.
+		// Encode "lastSeen" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "after",
+			Name:    "lastSeen",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.After.Get(); ok {
+			if val, ok := params.LastSeen.Get(); ok {
 				return e.EncodeValue(conv.DateTimeToString(val))
 			}
 			return nil
@@ -424,15 +424,32 @@ func (c *Client) sendGetServerStatsByID(ctx context.Context, params GetServerSta
 		}
 	}
 	{
-		// Encode "order" parameter.
+		// Encode "timeOrder" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
-			Name:    "order",
+			Name:    "timeOrder",
 			Style:   uri.QueryStyleForm,
 			Explode: true,
 		}
 
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
-			if val, ok := params.Order.Get(); ok {
+			if val, ok := params.TimeOrder.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "precision" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "precision",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.Precision.Get(); ok {
 				return e.EncodeValue(conv.StringToString(string(val)))
 			}
 			return nil
@@ -456,7 +473,7 @@ func (c *Client) sendGetServerStatsByID(ctx context.Context, params GetServerSta
 	defer resp.Body.Close()
 
 	stage = "DecodeResponse"
-	result, err := decodeGetServerStatsByIDResponse(resp)
+	result, err := decodeGetServerStatisticsByIDResponse(resp)
 	if err != nil {
 		return res, errors.Wrap(err, "decode response")
 	}
@@ -536,6 +553,23 @@ func (c *Client) sendGetServersByMultiplayer(ctx context.Context, params GetServ
 	stage = "EncodeQueryParams"
 	q := uri.NewQueryEncoder()
 	{
+		// Encode "playersOrder" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "playersOrder",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.PlayersOrder.Get(); ok {
+				return e.EncodeValue(conv.StringToString(string(val)))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
 		// Encode "count" parameter.
 		cfg := uri.QueryParameterEncodingConfig{
 			Name:    "count",
@@ -546,6 +580,23 @@ func (c *Client) sendGetServersByMultiplayer(ctx context.Context, params GetServ
 		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
 			if val, ok := params.Count.Get(); ok {
 				return e.EncodeValue(conv.Int32ToString(val))
+			}
+			return nil
+		}); err != nil {
+			return res, errors.Wrap(err, "encode query")
+		}
+	}
+	{
+		// Encode "includeOffline" parameter.
+		cfg := uri.QueryParameterEncodingConfig{
+			Name:    "includeOffline",
+			Style:   uri.QueryStyleForm,
+			Explode: true,
+		}
+
+		if err := q.EncodeParam(cfg, func(e uri.Encoder) error {
+			if val, ok := params.IncludeOffline.Get(); ok {
+				return e.EncodeValue(conv.BoolToString(val))
 			}
 			return nil
 		}); err != nil {
