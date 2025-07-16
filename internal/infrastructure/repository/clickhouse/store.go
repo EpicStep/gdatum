@@ -6,10 +6,12 @@ package clickhouse
 import (
 	"context"
 	"fmt"
+
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
-	"github.com/EpicStep/gdatum/internal/stats/repository"
-	"github.com/EpicStep/gdatum/internal/utils/sql"
 	"github.com/huandu/go-sqlbuilder"
+
+	"github.com/EpicStep/gdatum/internal/domain"
+	"github.com/EpicStep/gdatum/internal/utils/sql"
 )
 
 // Store ...
@@ -65,7 +67,8 @@ func (s *Store) InsertServers(ctx context.Context, servers []Server) error {
 	return nil
 }
 
-func (s *Store) GetMultiplayersSummary(ctx context.Context, playersOrder repository.Order) ([]MultiplayerSummary, error) {
+// MultiplayersSummary ...
+func (s *Store) MultiplayersSummary(ctx context.Context, playersOrder domain.Order) ([]MultiplayerSummary, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 
 	sb = sb.From(serversOnlineTableName).
@@ -73,7 +76,7 @@ func (s *Store) GetMultiplayersSummary(ctx context.Context, playersOrder reposit
 		Where(fmt.Sprintf("%s = toStartOfHour(now())", timestampColumnName)).
 		GroupBy(multiplayerColumnName)
 
-	if playersOrder == repository.OrderAsc {
+	if playersOrder == domain.OrderAsc {
 		sb = sb.OrderBy(onlineColumnName + " ASC")
 	} else {
 		sb = sb.OrderBy(onlineColumnName + " DESC")
@@ -89,7 +92,8 @@ func (s *Store) GetMultiplayersSummary(ctx context.Context, playersOrder reposit
 	return result, nil
 }
 
-func (s *Store) GetServersByMultiplayer(ctx context.Context, filter repository.GetServersByMultiplayerFilter) ([]ServerSummary, error) {
+// ServersByMultiplayer ...
+func (s *Store) ServersByMultiplayer(ctx context.Context, filter domain.ServersByMultiplayerFilter) ([]ServerSummary, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 
 	sb = sb.From(serversInfoTableName).
@@ -103,7 +107,7 @@ func (s *Store) GetServersByMultiplayer(ctx context.Context, filter repository.G
 			fmt.Sprintf("%s.%s = toStartOfHour(now())", serversOnlineTableName, timestampColumnName),
 		).OrderBy(timestampColumnName + " DESC")
 
-	if filter.PlayersOrder == repository.OrderAsc {
+	if filter.PlayersOrder == domain.OrderAsc {
 		sb = sb.OrderBy(playersColumnName + " ASC")
 	} else {
 		sb = sb.OrderBy(playersColumnName + " DESC")
@@ -123,7 +127,8 @@ func (s *Store) GetServersByMultiplayer(ctx context.Context, filter repository.G
 	return result, nil
 }
 
-func (s *Store) GetServerByID(ctx context.Context, multiplayer string, identifier string) (Server, error) {
+// ServerByIdentifier ...
+func (s *Store) ServerByIdentifier(ctx context.Context, multiplayer domain.Multiplayer, identifier string) (Server, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 
 	sb = sb.From(serversInfoTableName).
@@ -152,18 +157,19 @@ func (s *Store) GetServerByID(ctx context.Context, multiplayer string, identifie
 	return srv, nil
 }
 
-func (s *Store) GetServerStatistics(ctx context.Context, filter repository.GetServerStatisticsFilter) ([]ServerStatistic, error) {
+// ServerStatistics ...
+func (s *Store) ServerStatistics(ctx context.Context, filter domain.ServerStatisticsFilter) ([]ServerStatistic, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 
 	timeSelect := wrapColumn("toStartOfHour", timestampColumnName)
-	if filter.Precision == repository.GetServerStatisticsFilterPrecisionPerDay {
+	if filter.Precision == domain.ServerStatisticsFilterPrecisionPerDay {
 		timeSelect = wrapColumn("toStartOfDay", timestampColumnName)
 	}
 
 	sb = sb.
 		From(serversOnlineTableName).
 		Select(
-			sb.As(timeSelect, timestampColumnName),
+			sb.As(timeSelect, atColumnName),
 			sb.As(wrapColumn("toInt32", wrapColumn("avg", playersColumnName)), playersColumnName),
 		).
 		Where(
@@ -174,14 +180,14 @@ func (s *Store) GetServerStatistics(ctx context.Context, filter repository.GetSe
 		Limit(int(filter.Count))
 
 	if !filter.LastSeen.IsZero() {
-		if filter.TimeOrder == repository.OrderAsc {
+		if filter.TimeOrder == domain.OrderAsc {
 			sb = sb.Where(sb.GreaterThan(timestampColumnName, filter.LastSeen))
 		} else {
 			sb = sb.Where(sb.LessThan(timestampColumnName, filter.LastSeen))
 		}
 	}
 
-	if filter.TimeOrder == repository.OrderAsc {
+	if filter.TimeOrder == domain.OrderAsc {
 		sb = sb.OrderBy(timestampColumnName + " ASC")
 	} else {
 		sb = sb.OrderBy(timestampColumnName + " DESC")

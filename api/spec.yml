@@ -20,11 +20,7 @@ paths:
           in: query
           description: Sort order by current players
           schema:
-            type: string
-            default: desc
-            enum:
-              - asc
-              - desc
+            $ref: "schemas.yml#/components/schemas/Order"
       responses:
         '200':
           $ref: "responses.yml#/components/responses/GetMultiplayersSummaryOK"
@@ -45,11 +41,7 @@ paths:
           in: query
           description: Sort order by players
           schema:
-            type: string
-            default: desc
-            enum:
-              - asc
-              - desc
+            $ref: "schemas.yml#/components/schemas/Order"
         - name: count
           in: query
           description: Count of return servers, -1 for all
@@ -130,11 +122,7 @@ paths:
           in: query
           description: Sort order by timestamp
           schema:
-            type: string
-            default: desc
-            enum:
-              - asc
-              - desc
+            $ref: "schemas.yml#/components/schemas/Order"
         - name: precision
           in: query
           description: Output precision

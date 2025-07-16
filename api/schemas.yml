@@ -1,5 +1,11 @@
 components:
   schemas:
+    Order:
+      type: string
+      default: desc
+      enum:
+        - asc
+        - desc
     MultiplayerSummary:
       type: object
       required:
@@ -29,10 +35,10 @@ components:
     ServerStatistic:
       type: object
       required:
-        - timestamp
+        - at
         - players
       properties:
-        timestamp:
+        at:
           type: string
           format: date-time
         players:

@@ -11,7 +11,7 @@ import (
 	"github.com/cenkalti/backoff/v5"
 	"go.uber.org/zap"
 
-	"github.com/EpicStep/gdatum/internal/stats/domain"
+	"github.com/EpicStep/gdatum/internal/domain"
 )
 
 type collectFunc func(ctx context.Context, collectedAt time.Time) ([]domain.Server, error)

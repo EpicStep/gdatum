@@ -27,16 +27,19 @@ type Server struct {
 	CollectedAt time.Time
 }
 
+// MultiplayerSummary ...
 type MultiplayerSummary struct {
 	Name    Multiplayer
 	Players int64
 }
 
+// ServerStatistic ..
 type ServerStatistic struct {
-	Players   int32
-	Timestamp time.Time
+	Players int32
+	At      time.Time
 }
 
+// ServerSummary ...
 type ServerSummary struct {
 	Identifier string
 	Name       string

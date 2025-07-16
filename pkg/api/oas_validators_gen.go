@@ -6,17 +6,6 @@ import (
 	"github.com/go-faster/errors"
 )
 
-func (s GetMultiplayersSummaryPlayersOrder) Validate() error {
-	switch s {
-	case "asc":
-		return nil
-	case "desc":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
 func (s GetServerStatisticsByIDOKApplicationJSON) Validate() error {
 	alias := ([]ServerStatistic)(s)
 	if alias == nil {
@@ -36,17 +25,6 @@ func (s GetServerStatisticsByIDPrecision) Validate() error {
 	}
 }
 
-func (s GetServerStatisticsByIDTimeOrder) Validate() error {
-	switch s {
-	case "asc":
-		return nil
-	case "desc":
-		return nil
-	default:
-		return errors.Errorf("invalid value: %v", s)
-	}
-}
-
 func (s GetServersByMultiplayerOKApplicationJSON) Validate() error {
 	alias := ([]ServerSummary)(s)
 	if alias == nil {
@@ -55,7 +33,7 @@ func (s GetServersByMultiplayerOKApplicationJSON) Validate() error {
 	return nil
 }
 
-func (s GetServersByMultiplayerPlayersOrder) Validate() error {
+func (s Order) Validate() error {
 	switch s {
 	case "asc":
 		return nil

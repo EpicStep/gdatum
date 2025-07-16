@@ -1,3 +1,6 @@
+// Copyright 2025 Stepan Rabotkin.
+// SPDX-License-Identifier: Apache-2.0.
+
 package clickhouse
 
 import "time"
@@ -16,8 +19,10 @@ const (
 	playersColumnName     = "players"
 	timestampColumnName   = "timestamp"
 	onlineColumnName      = "online"
+	atColumnName          = "at"
 )
 
+// Server ...
 type Server struct {
 	Multiplayer string    `ch:"multiplayer"`
 	Identifier  string    `ch:"identifier"`
@@ -29,16 +34,19 @@ type Server struct {
 	Timestamp   time.Time `ch:"timestamp"`
 }
 
+// MultiplayerSummary ...
 type MultiplayerSummary struct {
 	Multiplayer string `ch:"multiplayer"`
 	Players     int64  `ch:"online"`
 }
 
+// ServerStatistic ...
 type ServerStatistic struct {
-	Players   int32     `ch:"players"`
-	Timestamp time.Time `ch:"timestamp"`
+	Players int32     `ch:"players"`
+	At      time.Time `ch:"at"`
 }
 
+// ServerSummary ...
 type ServerSummary struct {
 	Identifier string `ch:"identifier"`
 	Name       string `ch:"name"`

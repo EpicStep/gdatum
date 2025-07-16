@@ -11,17 +11,21 @@ import (
 
 	"github.com/samber/lo"
 
-	"github.com/EpicStep/gdatum/internal/external/clients/ragemp"
-	"github.com/EpicStep/gdatum/internal/stats/domain"
+	"github.com/EpicStep/gdatum/internal/domain"
+	"github.com/EpicStep/gdatum/internal/infrastructure/clients/ragemp"
 )
+
+type client interface {
+	Servers(ctx context.Context) (ragemp.Servers, error)
+}
 
 // Adapter ...
 type Adapter struct {
-	client *ragemp.Client
+	client client
 }
 
 // New ...
-func New(client *ragemp.Client) *Adapter {
+func New(client client) *Adapter {
 	return &Adapter{
 		client: client,
 	}

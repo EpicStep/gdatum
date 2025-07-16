@@ -17,15 +17,15 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/EpicStep/gdatum"
+	clickhouseAdapter "github.com/EpicStep/gdatum/internal/adapters/clickhouse"
+	"github.com/EpicStep/gdatum/internal/collector"
 	"github.com/EpicStep/gdatum/internal/config"
 	"github.com/EpicStep/gdatum/internal/handlers/admin"
 	apiHandler "github.com/EpicStep/gdatum/internal/handlers/api"
-	clickhouseAdapter "github.com/EpicStep/gdatum/internal/stats/adapters/clickhouse"
-	"github.com/EpicStep/gdatum/internal/stats/collector"
-	clickhouseRepository "github.com/EpicStep/gdatum/internal/stats/repository/clickhouse"
+	clickhouseRepository "github.com/EpicStep/gdatum/internal/infrastructure/repository/clickhouse"
+	"github.com/EpicStep/gdatum/internal/infrastructure/server"
+	"github.com/EpicStep/gdatum/internal/infrastructure/worker"
 	"github.com/EpicStep/gdatum/internal/utils/migrations"
-	"github.com/EpicStep/gdatum/internal/utils/server"
-	"github.com/EpicStep/gdatum/internal/worker"
 	"github.com/EpicStep/gdatum/pkg/api"
 )
 

@@ -10,19 +10,19 @@ import (
 
 	"github.com/cenkalti/backoff/v5"
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 	"go.uber.org/zap"
 
-	ragempClient "github.com/EpicStep/gdatum/internal/external/clients/ragemp"
-	ragempAdapter "github.com/EpicStep/gdatum/internal/stats/adapters/ragemp"
-	"github.com/EpicStep/gdatum/internal/stats/domain"
-	"github.com/EpicStep/gdatum/internal/stats/repository"
+	ragempAdapter "github.com/EpicStep/gdatum/internal/adapters/ragemp"
+	"github.com/EpicStep/gdatum/internal/domain"
+	ragempClient "github.com/EpicStep/gdatum/internal/infrastructure/clients/ragemp"
 	backoffUtils "github.com/EpicStep/gdatum/internal/utils/backoff"
 )
 
 // Handler ...
 type Handler struct {
 	collectors []collectInstance
-	repo       repository.Repository
+	repo       domain.Repository
 
 	collectedGauge       *prometheus.GaugeVec
 	collectFailedCounter *prometheus.CounterVec
@@ -32,7 +32,7 @@ type Handler struct {
 }
 
 // New ...
-func New(repo repository.Repository, logger *zap.Logger) *Handler {
+func New(repo domain.Repository, logger *zap.Logger) *Handler {
 	if logger == nil {
 		logger = zap.L()
 	}
@@ -48,19 +48,19 @@ func New(repo repository.Repository, logger *zap.Logger) *Handler {
 		},
 		repo: repo,
 
-		collectedGauge: prometheus.NewGaugeVec(
+		collectedGauge: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
 				Name: "stats_servers_collected_count",
 				Help: "Number of servers that have been collected",
 			},
 			[]string{"multiplayer"}),
-		collectFailedCounter: prometheus.NewCounterVec(
+		collectFailedCounter: promauto.NewCounterVec(
 			prometheus.CounterOpts{
 				Name: "stats_collect_failed_total",
 				Help: "The total number of failed collects of server stats",
 			},
 			[]string{"multiplayer"}),
-		insertFailedCounter: prometheus.NewCounter(
+		insertFailedCounter: promauto.NewCounter(
 			prometheus.CounterOpts{
 				Name: "stats_insert_failed_total",
 				Help: "The total number of failed inserts to repository of server stats",

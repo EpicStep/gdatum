@@ -6,29 +6,31 @@ package api
 import (
 	"context"
 	"fmt"
-	"github.com/EpicStep/gdatum/internal/stats/domain"
-	"github.com/EpicStep/gdatum/internal/stats/repository"
-	"github.com/EpicStep/gdatum/pkg/api"
+
 	"github.com/go-faster/errors"
 	"github.com/samber/lo"
+
+	"github.com/EpicStep/gdatum/internal/domain"
+	"github.com/EpicStep/gdatum/pkg/api"
 )
 
 var _ api.Handler = (*Handlers)(nil)
 
 // Handlers ...
 type Handlers struct {
-	repo repository.Repository
+	repo domain.Repository
 }
 
 // New returns new Handlers.
-func New(repo repository.Repository) *Handlers {
+func New(repo domain.Repository) *Handlers {
 	return &Handlers{
 		repo: repo,
 	}
 }
 
+// GetMultiplayersSummary ...
 func (h *Handlers) GetMultiplayersSummary(ctx context.Context, params api.GetMultiplayersSummaryParams) ([]api.MultiplayerSummary, error) {
-	summary, err := h.repo.GetMultiplayersSummary(ctx, orderToRepository(string(params.PlayersOrder.Value)))
+	summary, err := h.repo.MultiplayersSummary(ctx, orderToDomain(params.PlayersOrder.Value))
 	if err != nil {
 		return nil, fmt.Errorf("h.repo.GetMultiplayersSummary: %w", err)
 	}
@@ -41,11 +43,12 @@ func (h *Handlers) GetMultiplayersSummary(ctx context.Context, params api.GetMul
 	}), nil
 }
 
+// GetServersByMultiplayer ...
 func (h *Handlers) GetServersByMultiplayer(ctx context.Context, params api.GetServersByMultiplayerParams) (api.GetServersByMultiplayerRes, error) {
-	servers, err := h.repo.GetServersByMultiplayer(ctx, repository.GetServersByMultiplayerFilter{
+	servers, err := h.repo.ServersByMultiplayer(ctx, domain.ServersByMultiplayerFilter{
 		Multiplayer:    domain.Multiplayer(params.MultiplayerName),
 		Count:          params.Count.Value,
-		PlayersOrder:   orderToRepository(string(params.PlayersOrder.Value)),
+		PlayersOrder:   orderToDomain(params.PlayersOrder.Value),
 		IncludeOffline: params.IncludeOffline.Value,
 	})
 	if err != nil {
@@ -63,8 +66,9 @@ func (h *Handlers) GetServersByMultiplayer(ctx context.Context, params api.GetSe
 	return &resp, nil
 }
 
+// GetServerByID ...
 func (h *Handlers) GetServerByID(ctx context.Context, params api.GetServerByIDParams) (api.GetServerByIDRes, error) {
-	server, err := h.repo.GetServerByID(ctx, params.MultiplayerName, params.ServerID)
+	server, err := h.repo.ServerByIdentifier(ctx, domain.Multiplayer(params.MultiplayerName), params.ServerID)
 	if err != nil {
 		if errors.Is(err, domain.ErrServerNotFound) {
 			return &api.GetServerByIDNotFound{}, nil
@@ -83,14 +87,15 @@ func (h *Handlers) GetServerByID(ctx context.Context, params api.GetServerByIDPa
 	}, nil
 }
 
+// GetServerStatisticsByID ...
 func (h *Handlers) GetServerStatisticsByID(ctx context.Context, params api.GetServerStatisticsByIDParams) (api.GetServerStatisticsByIDRes, error) {
-	statistics, err := h.repo.GetServerStatistics(ctx, repository.GetServerStatisticsFilter{
+	statistics, err := h.repo.ServerStatistics(ctx, domain.ServerStatisticsFilter{
 		Multiplayer: domain.Multiplayer(params.MultiplayerName),
 		Identifier:  params.ServerID,
-		TimeOrder:   orderToRepository(string(params.TimeOrder.Value)),
+		TimeOrder:   orderToDomain(params.TimeOrder.Value),
 		Count:       params.Count.Value,
 		LastSeen:    params.LastSeen.Value,
-		Precision:   precisionToRepository(params.Precision.Value),
+		Precision:   precisionToDomain(params.Precision.Value),
 	})
 	if err != nil {
 		if errors.Is(err, domain.ErrServerNotFound) {
@@ -102,28 +107,26 @@ func (h *Handlers) GetServerStatisticsByID(ctx context.Context, params api.GetSe
 
 	resp := api.GetServerStatisticsByIDOKApplicationJSON(lo.Map(statistics, func(stat domain.ServerStatistic, _ int) api.ServerStatistic {
 		return api.ServerStatistic{
-			Timestamp: stat.Timestamp,
-			Players:   stat.Players,
+			At:      stat.At,
+			Players: stat.Players,
 		}
 	}))
 
 	return &resp, nil
 }
 
-func orderToRepository(order string) repository.Order {
-	switch order {
-	case "asc":
-		return repository.OrderAsc
+func orderToDomain(order api.Order) domain.Order {
+	if order == api.OrderAsc {
+		return domain.OrderAsc
 	}
 
-	return repository.OrderDesc
+	return domain.OrderDesc
 }
 
-func precisionToRepository(precision api.GetServerStatisticsByIDPrecision) repository.GetServerStatisticsFilterPrecision {
-	switch precision {
-	case api.GetServerStatisticsByIDPrecisionPerDay:
-		return repository.GetServerStatisticsFilterPrecisionPerDay
+func precisionToDomain(precision api.GetServerStatisticsByIDPrecision) domain.ServerStatisticsFilterPrecision {
+	if precision == api.GetServerStatisticsByIDPrecisionPerDay {
+		return domain.ServerStatisticsFilterPrecisionPerDay
 	}
 
-	return repository.GetServerStatisticsFilterPrecisionPerHour
+	return domain.ServerStatisticsFilterPrecisionPerHour
 }

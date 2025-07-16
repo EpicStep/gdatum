@@ -523,8 +523,8 @@ func (s *ServerStatistic) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *ServerStatistic) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("timestamp")
-		json.EncodeDateTime(e, s.Timestamp)
+		e.FieldStart("at")
+		json.EncodeDateTime(e, s.At)
 	}
 	{
 		e.FieldStart("players")
@@ -533,7 +533,7 @@ func (s *ServerStatistic) encodeFields(e *jx.Encoder) {
 }
 
 var jsonFieldsNameOfServerStatistic = [2]string{
-	0: "timestamp",
+	0: "at",
 	1: "players",
 }
 
@@ -546,17 +546,17 @@ func (s *ServerStatistic) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "timestamp":
+		case "at":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
-				s.Timestamp = v
+				s.At = v
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"timestamp\"")
+				return errors.Wrap(err, "decode field \"at\"")
 			}
 		case "players":
 			requiredBitSet[0] |= 1 << 1
