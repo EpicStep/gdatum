@@ -3,4 +3,4 @@
 
 package gdatum
 
-//go:generate go run github.com/ogen-go/ogen/cmd/ogen --target pkg/api --clean api/spec.yml
+//go:generate go run github.com/ogen-go/ogen/cmd/ogen --target pkg/api --clean api/spec.yml ---config .ogen.yml

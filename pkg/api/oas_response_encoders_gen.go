@@ -11,7 +11,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func encodeGetMultiplayersSummaryResponse(response []GetMultiplayersSummaryOKItem, w http.ResponseWriter, span trace.Span) error {
+func encodeGetMultiplayersSummaryResponse(response []MultiplayerSummary, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))
@@ -55,9 +55,9 @@ func encodeGetServerByIDResponse(response GetServerByIDRes, w http.ResponseWrite
 	}
 }
 
-func encodeGetServerStatsByIDResponse(response GetServerStatsByIDRes, w http.ResponseWriter, span trace.Span) error {
+func encodeGetServerStatisticsByIDResponse(response GetServerStatisticsByIDRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetServerStatsByIDOKApplicationJSON:
+	case *GetServerStatisticsByIDOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -70,7 +70,7 @@ func encodeGetServerStatsByIDResponse(response GetServerStatsByIDRes, w http.Res
 
 		return nil
 
-	case *GetServerStatsByIDNotFound:
+	case *GetServerStatisticsByIDNotFound:
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
 

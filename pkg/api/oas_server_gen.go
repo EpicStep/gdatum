@@ -13,19 +13,19 @@ type Handler interface {
 	// Get multiplayers summary.
 	//
 	// GET /multiplayers/summary
-	GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) ([]GetMultiplayersSummaryOKItem, error)
+	GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) ([]MultiplayerSummary, error)
 	// GetServerByID implements getServerByID operation.
 	//
 	// Get server by ID.
 	//
 	// GET /multiplayer/{multiplayerName}/server/{serverID}
 	GetServerByID(ctx context.Context, params GetServerByIDParams) (GetServerByIDRes, error)
-	// GetServerStatsByID implements getServerStatsByID operation.
+	// GetServerStatisticsByID implements getServerStatisticsByID operation.
 	//
 	// Get server stats by ID.
 	//
-	// GET /multiplayer/{multiplayerName}/server/{serverID}/stats
-	GetServerStatsByID(ctx context.Context, params GetServerStatsByIDParams) (GetServerStatsByIDRes, error)
+	// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+	GetServerStatisticsByID(ctx context.Context, params GetServerStatisticsByIDParams) (GetServerStatisticsByIDRes, error)
 	// GetServersByMultiplayer implements getServersByMultiplayer operation.
 	//
 	// Get servers by multiplayer.

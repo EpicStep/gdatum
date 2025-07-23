@@ -3,7 +3,9 @@
 
 package domain
 
-import "time"
+import (
+	"time"
+)
 
 // Multiplayer ...
 type Multiplayer string
@@ -21,6 +23,25 @@ type Server struct {
 	URL         string
 	Gamemode    string
 	Lang        string
-	Players     uint
+	Players     int32
 	CollectedAt time.Time
+}
+
+// MultiplayerSummary ...
+type MultiplayerSummary struct {
+	Name    Multiplayer
+	Players int64
+}
+
+// ServerStatistic ..
+type ServerStatistic struct {
+	Players int32
+	At      time.Time
+}
+
+// ServerSummary ...
+type ServerSummary struct {
+	Identifier string
+	Name       string
+	Players    int32
 }

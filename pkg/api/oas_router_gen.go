@@ -125,9 +125,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							return
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/stats"
+						case '/': // Prefix: "/statistics"
 
-							if l := len("/stats"); len(elem) >= l && elem[0:l] == "/stats" {
+							if l := len("/statistics"); len(elem) >= l && elem[0:l] == "/statistics" {
 								elem = elem[l:]
 							} else {
 								break
@@ -137,7 +137,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 								// Leaf node.
 								switch r.Method {
 								case "GET":
-									s.handleGetServerStatsByIDRequest([2]string{
+									s.handleGetServerStatisticsByIDRequest([2]string{
 										args[0],
 										args[1],
 									}, elemIsEscaped, w, r)
@@ -355,9 +355,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							}
 						}
 						switch elem[0] {
-						case '/': // Prefix: "/stats"
+						case '/': // Prefix: "/statistics"
 
-							if l := len("/stats"); len(elem) >= l && elem[0:l] == "/stats" {
+							if l := len("/statistics"); len(elem) >= l && elem[0:l] == "/statistics" {
 								elem = elem[l:]
 							} else {
 								break
@@ -367,10 +367,10 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								// Leaf node.
 								switch method {
 								case "GET":
-									r.name = GetServerStatsByIDOperation
+									r.name = GetServerStatisticsByIDOperation
 									r.summary = "Get server stats by ID"
-									r.operationID = "getServerStatsByID"
-									r.pathPattern = "/multiplayer/{multiplayerName}/server/{serverID}/stats"
+									r.operationID = "getServerStatisticsByID"
+									r.pathPattern = "/multiplayer/{multiplayerName}/server/{serverID}/statistics"
 									r.args = args
 									r.count = 2
 									return r, true

@@ -5,8 +5,8 @@ type GetServerByIDRes interface {
 	getServerByIDRes()
 }
 
-type GetServerStatsByIDRes interface {
-	getServerStatsByIDRes()
+type GetServerStatisticsByIDRes interface {
+	getServerStatisticsByIDRes()
 }
 
 type GetServersByMultiplayerRes interface {

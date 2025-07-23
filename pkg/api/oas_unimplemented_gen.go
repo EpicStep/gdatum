@@ -18,7 +18,7 @@ var _ Handler = UnimplementedHandler{}
 // Get multiplayers summary.
 //
 // GET /multiplayers/summary
-func (UnimplementedHandler) GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) (r []GetMultiplayersSummaryOKItem, _ error) {
+func (UnimplementedHandler) GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) (r []MultiplayerSummary, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
@@ -31,12 +31,12 @@ func (UnimplementedHandler) GetServerByID(ctx context.Context, params GetServerB
 	return r, ht.ErrNotImplemented
 }
 
-// GetServerStatsByID implements getServerStatsByID operation.
+// GetServerStatisticsByID implements getServerStatisticsByID operation.
 //
 // Get server stats by ID.
 //
-// GET /multiplayer/{multiplayerName}/server/{serverID}/stats
-func (UnimplementedHandler) GetServerStatsByID(ctx context.Context, params GetServerStatsByIDParams) (r GetServerStatsByIDRes, _ error) {
+// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+func (UnimplementedHandler) GetServerStatisticsByID(ctx context.Context, params GetServerStatisticsByIDParams) (r GetServerStatisticsByIDRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 

@@ -115,7 +115,7 @@ func (s *Server) handleGetMultiplayersSummaryRequest(args [0]string, argsEscaped
 		return
 	}
 
-	var response []GetMultiplayersSummaryOKItem
+	var response []MultiplayerSummary
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
@@ -125,9 +125,9 @@ func (s *Server) handleGetMultiplayersSummaryRequest(args [0]string, argsEscaped
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
-					Name: "order",
+					Name: "playersOrder",
 					In:   "query",
-				}: params.Order,
+				}: params.PlayersOrder,
 			},
 			Raw: r,
 		}
@@ -135,7 +135,7 @@ func (s *Server) handleGetMultiplayersSummaryRequest(args [0]string, argsEscaped
 		type (
 			Request  = struct{}
 			Params   = GetMultiplayersSummaryParams
-			Response = []GetMultiplayersSummaryOKItem
+			Response = []MultiplayerSummary
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -310,22 +310,22 @@ func (s *Server) handleGetServerByIDRequest(args [2]string, argsEscaped bool, w 
 	}
 }
 
-// handleGetServerStatsByIDRequest handles getServerStatsByID operation.
+// handleGetServerStatisticsByIDRequest handles getServerStatisticsByID operation.
 //
 // Get server stats by ID.
 //
-// GET /multiplayer/{multiplayerName}/server/{serverID}/stats
-func (s *Server) handleGetServerStatsByIDRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
+// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+func (s *Server) handleGetServerStatisticsByIDRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	otelAttrs := []attribute.KeyValue{
-		otelogen.OperationID("getServerStatsByID"),
+		otelogen.OperationID("getServerStatisticsByID"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/multiplayer/{multiplayerName}/server/{serverID}/stats"),
+		semconv.HTTPRouteKey.String("/multiplayer/{multiplayerName}/server/{serverID}/statistics"),
 	}
 
 	// Start a span for this request.
-	ctx, span := s.cfg.Tracer.Start(r.Context(), GetServerStatsByIDOperation,
+	ctx, span := s.cfg.Tracer.Start(r.Context(), GetServerStatisticsByIDOperation,
 		trace.WithAttributes(otelAttrs...),
 		serverSpanKind,
 	)
@@ -380,11 +380,11 @@ func (s *Server) handleGetServerStatsByIDRequest(args [2]string, argsEscaped boo
 		}
 		err          error
 		opErrContext = ogenerrors.OperationContext{
-			Name: GetServerStatsByIDOperation,
-			ID:   "getServerStatsByID",
+			Name: GetServerStatisticsByIDOperation,
+			ID:   "getServerStatisticsByID",
 		}
 	)
-	params, err := decodeGetServerStatsByIDParams(args, argsEscaped, r)
+	params, err := decodeGetServerStatisticsByIDParams(args, argsEscaped, r)
 	if err != nil {
 		err = &ogenerrors.DecodeParamsError{
 			OperationContext: opErrContext,
@@ -395,13 +395,13 @@ func (s *Server) handleGetServerStatsByIDRequest(args [2]string, argsEscaped boo
 		return
 	}
 
-	var response GetServerStatsByIDRes
+	var response GetServerStatisticsByIDRes
 	if m := s.cfg.Middleware; m != nil {
 		mreq := middleware.Request{
 			Context:          ctx,
-			OperationName:    GetServerStatsByIDOperation,
+			OperationName:    GetServerStatisticsByIDOperation,
 			OperationSummary: "Get server stats by ID",
-			OperationID:      "getServerStatsByID",
+			OperationID:      "getServerStatisticsByID",
 			Body:             nil,
 			Params: middleware.Parameters{
 				{
@@ -417,21 +417,25 @@ func (s *Server) handleGetServerStatsByIDRequest(args [2]string, argsEscaped boo
 					In:   "query",
 				}: params.Count,
 				{
-					Name: "after",
+					Name: "lastSeen",
 					In:   "query",
-				}: params.After,
+				}: params.LastSeen,
 				{
-					Name: "order",
+					Name: "timeOrder",
 					In:   "query",
-				}: params.Order,
+				}: params.TimeOrder,
+				{
+					Name: "precision",
+					In:   "query",
+				}: params.Precision,
 			},
 			Raw: r,
 		}
 
 		type (
 			Request  = struct{}
-			Params   = GetServerStatsByIDParams
-			Response = GetServerStatsByIDRes
+			Params   = GetServerStatisticsByIDParams
+			Response = GetServerStatisticsByIDRes
 		)
 		response, err = middleware.HookMiddleware[
 			Request,
@@ -440,14 +444,14 @@ func (s *Server) handleGetServerStatsByIDRequest(args [2]string, argsEscaped boo
 		](
 			m,
 			mreq,
-			unpackGetServerStatsByIDParams,
+			unpackGetServerStatisticsByIDParams,
 			func(ctx context.Context, request Request, params Params) (response Response, err error) {
-				response, err = s.h.GetServerStatsByID(ctx, params)
+				response, err = s.h.GetServerStatisticsByID(ctx, params)
 				return response, err
 			},
 		)
 	} else {
-		response, err = s.h.GetServerStatsByID(ctx, params)
+		response, err = s.h.GetServerStatisticsByID(ctx, params)
 	}
 	if err != nil {
 		defer recordError("Internal", err)
@@ -455,7 +459,7 @@ func (s *Server) handleGetServerStatsByIDRequest(args [2]string, argsEscaped boo
 		return
 	}
 
-	if err := encodeGetServerStatsByIDResponse(response, w, span); err != nil {
+	if err := encodeGetServerStatisticsByIDResponse(response, w, span); err != nil {
 		defer recordError("EncodeResponse", err)
 		if !errors.Is(err, ht.ErrInternalServerErrorResponse) {
 			s.cfg.ErrorHandler(ctx, w, r, err)
@@ -563,9 +567,17 @@ func (s *Server) handleGetServersByMultiplayerRequest(args [1]string, argsEscape
 					In:   "path",
 				}: params.MultiplayerName,
 				{
+					Name: "playersOrder",
+					In:   "query",
+				}: params.PlayersOrder,
+				{
 					Name: "count",
 					In:   "query",
 				}: params.Count,
+				{
+					Name: "includeOffline",
+					In:   "query",
+				}: params.IncludeOffline,
 			},
 			Raw: r,
 		}

@@ -4,7 +4,7 @@ CREATE TABLE servers_online
 (
     multiplayer LowCardinality(String),
     identifier  String,
-    players     UInt32,
+    players     Int32,
     timestamp   Datetime
 ) ENGINE = MergeTree()
     ORDER BY (identifier, multiplayer, timestamp)
