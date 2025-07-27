@@ -56,6 +56,12 @@ linters:
           disabled: true
         - name: function-length
           disabled: true
+        - name: unhandled-error
+          arguments: [ "fmt.Println",
+                       "strings.Builder.WriteString",
+                       "strings.Builder.WriteByte" ]
+        - name: cyclomatic
+          arguments: [15]
     staticcheck:
       checks:
         - all
