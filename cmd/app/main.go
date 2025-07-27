@@ -27,16 +27,23 @@ import (
 	"github.com/EpicStep/gdatum/internal/infrastructure/server"
 	"github.com/EpicStep/gdatum/internal/infrastructure/worker"
 	"github.com/EpicStep/gdatum/internal/metrics"
+	"github.com/EpicStep/gdatum/internal/utils/buildinfo"
 	"github.com/EpicStep/gdatum/internal/utils/migrations"
 	"github.com/EpicStep/gdatum/pkg/api"
 )
 
 var (
+	showVersion   = flag.Bool("version", false, "Print version")
 	runMigrations = flag.Bool("migrate", false, "run migrations")
 )
 
 func main() {
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Println(buildinfo.Get().String())
+		return
+	}
 
 	logger, _ := zap.NewProduction() //nolint:errcheck
 	defer logger.Sync()              //nolint:errcheck

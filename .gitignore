@@ -90,3 +90,4 @@ network_closure.sh
 /.*-push
 /.go
 /bin
+/dist
