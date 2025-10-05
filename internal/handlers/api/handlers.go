@@ -30,7 +30,7 @@ func New(repo domain.Repository) *Handlers {
 
 // GetMultiplayersSummary ...
 func (h *Handlers) GetMultiplayersSummary(ctx context.Context, params api.GetMultiplayersSummaryParams) ([]api.MultiplayerSummary, error) {
-	summary, err := h.repo.MultiplayersSummary(ctx, orderToDomain(params.PlayersOrder.Value))
+	summary, err := h.repo.GetMultiplayersSummary(ctx, orderToDomain(params.PlayersOrder.Value))
 	if err != nil {
 		return nil, fmt.Errorf("h.repo.GetMultiplayersSummary: %w", err)
 	}
@@ -45,7 +45,7 @@ func (h *Handlers) GetMultiplayersSummary(ctx context.Context, params api.GetMul
 
 // GetServersByMultiplayer ...
 func (h *Handlers) GetServersByMultiplayer(ctx context.Context, params api.GetServersByMultiplayerParams) (api.GetServersByMultiplayerRes, error) {
-	servers, err := h.repo.ServersByMultiplayer(ctx, domain.ServersByMultiplayerFilter{
+	servers, err := h.repo.GetServersByMultiplayer(ctx, domain.ServersByMultiplayerFilter{
 		Multiplayer:    domain.Multiplayer(params.MultiplayerName),
 		Count:          params.Count.Value,
 		PlayersOrder:   orderToDomain(params.PlayersOrder.Value),
@@ -57,7 +57,7 @@ func (h *Handlers) GetServersByMultiplayer(ctx context.Context, params api.GetSe
 
 	resp := api.GetServersByMultiplayerOKApplicationJSON(lo.Map(servers, func(server domain.ServerSummary, _ int) api.ServerSummary {
 		return api.ServerSummary{
-			ID:      server.Identifier,
+			ID:      server.ID,
 			Name:    server.Name,
 			Players: server.Players,
 		}
@@ -68,7 +68,7 @@ func (h *Handlers) GetServersByMultiplayer(ctx context.Context, params api.GetSe
 
 // GetServerByID ...
 func (h *Handlers) GetServerByID(ctx context.Context, params api.GetServerByIDParams) (api.GetServerByIDRes, error) {
-	server, err := h.repo.ServerByIdentifier(ctx, domain.Multiplayer(params.MultiplayerName), params.ServerID)
+	server, err := h.repo.GetServerByID(ctx, domain.Multiplayer(params.MultiplayerName), params.ServerID)
 	if err != nil {
 		if errors.Is(err, domain.ErrServerNotFound) {
 			return &api.GetServerByIDNotFound{}, nil
@@ -89,9 +89,9 @@ func (h *Handlers) GetServerByID(ctx context.Context, params api.GetServerByIDPa
 
 // GetServerStatisticsByID ...
 func (h *Handlers) GetServerStatisticsByID(ctx context.Context, params api.GetServerStatisticsByIDParams) (api.GetServerStatisticsByIDRes, error) {
-	statistics, err := h.repo.ServerStatistics(ctx, domain.ServerStatisticsFilter{
+	statistics, err := h.repo.GetServerStatistics(ctx, domain.ServerStatisticsFilter{
 		Multiplayer: domain.Multiplayer(params.MultiplayerName),
-		Identifier:  params.ServerID,
+		ID:          params.ServerID,
 		TimeOrder:   orderToDomain(params.TimeOrder.Value),
 		Count:       params.Count.Value,
 		LastSeen:    params.LastSeen.Value,

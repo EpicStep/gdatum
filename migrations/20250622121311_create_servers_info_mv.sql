@@ -3,14 +3,14 @@
 CREATE
 MATERIALIZED VIEW servers_info_mv TO servers_info AS
 SELECT multiplayer,
-       identifier,
+       id,
        name,
        url,
        gamemode,
        lang,
-       timestamp
+       collected_at
 FROM servers_metrics_raw
-GROUP BY multiplayer, identifier, name, url, gamemode, lang, timestamp;
+GROUP BY multiplayer, id, name, url, gamemode, lang, collected_at;
 -- +goose StatementEnd
 
 -- +goose Down

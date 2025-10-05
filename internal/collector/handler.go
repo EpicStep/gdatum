@@ -19,14 +19,19 @@ import (
 	backoffUtils "github.com/EpicStep/gdatum/internal/utils/backoff"
 )
 
+const (
+	prometheusNamespaceName = "gdatum"
+	prometheusSubsystemName = "servers_stats_collector"
+)
+
 // Handler ...
 type Handler struct {
 	collectors []collectInstance
 	repo       domain.Repository
 
-	collectedGauge       *prometheus.GaugeVec
-	collectFailedCounter *prometheus.CounterVec
-	insertFailedCounter  prometheus.Counter
+	serversCollected      *prometheus.GaugeVec
+	collectionErrorsTotal *prometheus.CounterVec
+	insertErrorsTotal     prometheus.Counter
 
 	logger *zap.Logger
 }
@@ -48,22 +53,28 @@ func New(repo domain.Repository, logger *zap.Logger) *Handler {
 		},
 		repo: repo,
 
-		collectedGauge: promauto.NewGaugeVec(
+		serversCollected: promauto.NewGaugeVec(
 			prometheus.GaugeOpts{
-				Name: "stats_servers_collected_count",
-				Help: "Number of servers that have been collected",
+				Namespace: prometheusNamespaceName,
+				Subsystem: prometheusSubsystemName,
+				Name:      "servers_collected",
+				Help:      "Number of servers collected from each multiplayer platform",
 			},
 			[]string{"multiplayer"}),
-		collectFailedCounter: promauto.NewCounterVec(
+		collectionErrorsTotal: promauto.NewCounterVec(
 			prometheus.CounterOpts{
-				Name: "stats_collect_failed_total",
-				Help: "The total number of failed collects of server stats",
+				Namespace: prometheusNamespaceName,
+				Subsystem: prometheusSubsystemName,
+				Name:      "collection_errors_total",
+				Help:      "Total number of server collection errors by multiplayer",
 			},
 			[]string{"multiplayer"}),
-		insertFailedCounter: promauto.NewCounter(
+		insertErrorsTotal: promauto.NewCounter(
 			prometheus.CounterOpts{
-				Name: "stats_insert_failed_total",
-				Help: "The total number of failed inserts to repository of server stats",
+				Namespace: prometheusNamespaceName,
+				Subsystem: prometheusSubsystemName,
+				Name:      "insert_errors_total",
+				Help:      "Total number of errors when inserting server data to repository",
 			},
 		),
 
@@ -99,7 +110,7 @@ func (h *Handler) Handle(ctx context.Context) error {
 		backoff.WithMaxTries(3),
 	)
 	if err != nil {
-		h.insertFailedCounter.Inc()
+		h.insertErrorsTotal.Inc()
 		return fmt.Errorf("backoff.Retry: %w", err)
 	}
 

@@ -3,13 +3,13 @@
 CREATE TABLE servers_metrics_raw
 (
     multiplayer LowCardinality(String),
-    identifier  String,
+    id          String, -- it’s almost an IP address, but sometimes it may not be
     name        String,
     url         String,
     gamemode    String,
     lang        String,
     players     Int32,
-    timestamp   Datetime
+    collected_at   Datetime
 ) ENGINE = Null;
 -- +goose StatementEnd
 

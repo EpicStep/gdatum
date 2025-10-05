@@ -11,10 +11,10 @@ import (
 // Repository ...
 type Repository interface {
 	InsertServers(ctx context.Context, servers []Server) error
-	MultiplayersSummary(ctx context.Context, playersOrder Order) ([]MultiplayerSummary, error)
-	ServersByMultiplayer(ctx context.Context, filter ServersByMultiplayerFilter) ([]ServerSummary, error)
-	ServerByIdentifier(ctx context.Context, multiplayer Multiplayer, identifier string) (Server, error)
-	ServerStatistics(ctx context.Context, filter ServerStatisticsFilter) ([]ServerStatistic, error)
+	GetMultiplayersSummary(ctx context.Context, playersOrder Order) ([]MultiplayerSummary, error)
+	GetServersByMultiplayer(ctx context.Context, filter ServersByMultiplayerFilter) ([]ServerSummary, error)
+	GetServerByID(ctx context.Context, multiplayer Multiplayer, id string) (Server, error)
+	GetServerStatistics(ctx context.Context, filter ServerStatisticsFilter) ([]ServerStatistic, error)
 }
 
 // Order ...
@@ -48,7 +48,7 @@ const (
 // ServerStatisticsFilter ...
 type ServerStatisticsFilter struct {
 	Multiplayer Multiplayer
-	Identifier  string
+	ID          string
 	TimeOrder   Order
 	Count       int32
 	LastSeen    time.Time

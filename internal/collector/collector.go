@@ -62,7 +62,7 @@ func (h *Handler) collect(ctx context.Context) []domain.Server {
 					zap.Error(err),
 				)
 
-				h.collectFailedCounter.WithLabelValues(string(collector.Multiplayer)).Inc()
+				h.collectionErrorsTotal.WithLabelValues(string(collector.Multiplayer)).Inc()
 
 				return
 			}
@@ -72,7 +72,7 @@ func (h *Handler) collect(ctx context.Context) []domain.Server {
 				zap.Int("count", len(collectedServers)),
 			)
 
-			h.collectedGauge.
+			h.serversCollectedGauge.
 				WithLabelValues(string(collector.Multiplayer)).
 				Set(float64(len(collectedServers)))
 

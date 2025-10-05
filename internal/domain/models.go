@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-// Multiplayer ...
+// Multiplayer is an alias that represents supported multiplayer's.
 type Multiplayer string
 
 const (
@@ -18,7 +18,7 @@ const (
 // Server ...
 type Server struct {
 	Multiplayer Multiplayer
-	Identifier  string
+	ID          string
 	Name        string
 	URL         string
 	Gamemode    string
@@ -41,7 +41,7 @@ type ServerStatistic struct {
 
 // ServerSummary ...
 type ServerSummary struct {
-	Identifier string
-	Name       string
-	Players    int32
+	ID      string
+	Name    string
+	Players int32
 }

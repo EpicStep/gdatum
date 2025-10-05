@@ -5,7 +5,6 @@ package ragemp
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -35,7 +34,7 @@ func New(client client) *Adapter {
 func (a *Adapter) Servers(ctx context.Context, collectedAt time.Time) ([]domain.Server, error) {
 	servers, err := a.client.Servers(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed to get ragemp servers: %w", err)
+		return nil, err
 	}
 
 	return lo.MapToSlice(servers, func(ip string, server ragemp.Server) domain.Server {
@@ -45,7 +44,7 @@ func (a *Adapter) Servers(ctx context.Context, collectedAt time.Time) ([]domain.
 
 		return domain.Server{
 			Multiplayer: domain.MultiplayerRagemp,
-			Identifier:  ip,
+			ID:          ip,
 			Name:        server.Name,
 			Gamemode:    server.Gamemode,
 			Lang:        server.Lang,

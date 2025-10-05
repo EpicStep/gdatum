@@ -11,13 +11,13 @@ const (
 	serversOnlineTableName     = "servers_online"
 
 	multiplayerColumnName = "multiplayer"
-	identifierColumnName  = "identifier"
+	idColumnName          = "id"
 	nameColumnName        = "name"
 	langColumnName        = "lang"
 	gamemodeColumnName    = "gamemode"
 	urlColumnName         = "url"
 	playersColumnName     = "players"
-	timestampColumnName   = "timestamp"
+	collectedAtColumnName = "collected_at"
 	onlineColumnName      = "online"
 	atColumnName          = "at"
 )
@@ -25,13 +25,13 @@ const (
 // Server ...
 type Server struct {
 	Multiplayer string    `ch:"multiplayer"`
-	Identifier  string    `ch:"identifier"`
+	ID          string    `ch:"id"`
 	Name        string    `ch:"name"`
 	URL         string    `ch:"url"`
 	Gamemode    string    `ch:"gamemode"`
 	Lang        string    `ch:"lang"`
 	Players     int32     `ch:"players"`
-	Timestamp   time.Time `ch:"timestamp"`
+	CollectedAt time.Time `ch:"collected_at"`
 }
 
 // MultiplayerSummary ...
@@ -48,7 +48,7 @@ type ServerStatistic struct {
 
 // ServerSummary ...
 type ServerSummary struct {
-	Identifier string `ch:"identifier"`
-	Name       string `ch:"name"`
-	Players    int32  `ch:"players"`
+	ID      string `ch:"id"`
+	Name    string `ch:"name"`
+	Players int32  `ch:"players"`
 }

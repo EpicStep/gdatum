@@ -120,7 +120,7 @@ paths:
             format: date-time
         - name: timeOrder
           in: query
-          description: Sort order by timestamp
+          description: Sort order by collection time
           schema:
             $ref: "schemas.yml#/components/schemas/Order"
         - name: precision
