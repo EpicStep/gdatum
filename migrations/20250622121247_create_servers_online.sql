@@ -2,13 +2,13 @@
 -- +goose StatementBegin
 CREATE TABLE servers_online
 (
-    multiplayer LowCardinality(String),
-    id          String,
-    players     Int32,
-    collected_at   Datetime
+    multiplayer   LowCardinality(String),
+    id            String,
+    players_count Int32,
+    collected_at  Datetime
 ) ENGINE = MergeTree()
-    ORDER BY (id, multiplayer, collected_at)
-    PARTITION BY toYYYYMM(collected_at);
+      ORDER BY (id, multiplayer, collected_at)
+      PARTITION BY toYYYYMM(collected_at);
 -- +goose StatementEnd
 
 -- +goose Down

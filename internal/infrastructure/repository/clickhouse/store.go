@@ -35,7 +35,7 @@ func (s *Store) InsertServers(ctx context.Context, servers []Server) error {
 	ib := sqlbuilder.
 		NewInsertBuilder().
 		InsertInto(serversMetricsRawTableName).
-		Cols(multiplayerColumnName, idColumnName, nameColumnName, langColumnName, gamemodeColumnName, urlColumnName, playersColumnName, collectedAtColumnName)
+		Cols(multiplayerColumnName, idColumnName, nameColumnName, languageColumnName, gamemodeColumnName, urlColumnName, playersCountColumnName, collectedAtColumnName)
 
 	sqlRaw, _ := sql.Build(ib)
 
@@ -49,10 +49,10 @@ func (s *Store) InsertServers(ctx context.Context, servers []Server) error {
 			server.Multiplayer,
 			server.ID,
 			server.Name,
-			server.Lang,
+			server.Language,
 			server.Gamemode,
 			server.URL,
-			server.Players,
+			server.PlayersCount,
 			server.CollectedAt,
 		)
 		if err != nil {
@@ -67,72 +67,67 @@ func (s *Store) InsertServers(ctx context.Context, servers []Server) error {
 	return nil
 }
 
-// GetMultiplayersSummary ...
-func (s *Store) GetMultiplayersSummary(ctx context.Context, playersOrder domain.Order) ([]MultiplayerSummary, error) {
+// ListMultiplayerSummaries ...
+func (s *Store) ListMultiplayerSummaries(ctx context.Context, playersOrderAsc bool) ([]MultiplayerSummary, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 
 	sb = sb.From(serversOnlineTableName).
-		Select(multiplayerColumnName, sb.As(wrapColumn("sum", playersColumnName), onlineColumnName)).
+		Select(multiplayerColumnName, sb.As(wrapColumn("sum", playersCountColumnName), playersCountColumnName)).
 		Where(fmt.Sprintf("%s = toStartOfHour(now())", collectedAtColumnName)).
 		GroupBy(multiplayerColumnName)
 
-	if playersOrder == domain.OrderAsc {
-		sb = sb.OrderBy(onlineColumnName + " ASC")
-	} else {
-		sb = sb.OrderBy(onlineColumnName + " DESC")
+	if !playersOrderAsc {
+		sb = sb.OrderBy(playersCountColumnName + " DESC")
 	}
 
 	sqlRaw, args := sb.Build()
 
 	var result []MultiplayerSummary
 	if err := s.db.Select(ctx, &result, sqlRaw, args...); err != nil {
-		return nil, fmt.Errorf("r.db.Select: %w", err)
+		return nil, fmt.Errorf("s.db.Select: %w", err)
 	}
 
 	return result, nil
 }
 
-// GetServersByMultiplayer ...
-func (s *Store) GetServersByMultiplayer(ctx context.Context, filter domain.ServersByMultiplayerFilter) ([]ServerSummary, error) {
+// ListServerSummaries ...
+func (s *Store) ListServerSummaries(ctx context.Context, params domain.ListServerSummariesParams) ([]ServerSummary, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 
 	sb = sb.From(serversInfoTableName).
-		Select(idColumnName, nameColumnName, playersColumnName).
-		Where(sb.Equal(multiplayerColumnName, string(filter.Multiplayer))).
+		Select(idColumnName, nameColumnName, playersCountColumnName).
+		Where(sb.Equal(multiplayerColumnName, string(params.Multiplayer))).
 		JoinWithOption(
 			sqlbuilder.LeftJoin,
 			serversOnlineTableName,
 			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, multiplayerColumnName, serversOnlineTableName, multiplayerColumnName),
 			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, idColumnName, serversOnlineTableName, idColumnName),
 			fmt.Sprintf("%s.%s = toStartOfHour(now())", serversOnlineTableName, collectedAtColumnName),
-		).OrderBy(collectedAtColumnName + " DESC")
+		).
+		OrderBy(collectedAtColumnName + " DESC").
+		Limit(int(params.Limit)).
+		Offset(int(params.Offset))
 
-	if filter.PlayersOrder == domain.OrderAsc {
-		sb = sb.OrderBy(playersColumnName + " ASC")
-	} else {
-		sb = sb.OrderBy(playersColumnName + " DESC")
-	}
-
-	if filter.Count >= 0 {
-		sb = sb.Limit(int(filter.Count))
+	if !params.PlayersOrderAsc {
+		sb = sb.OrderBy(playersCountColumnName + " DESC")
 	}
 
 	sqlRaw, args := sb.Build()
 
 	var result []ServerSummary
 	if err := s.db.Select(ctx, &result, sqlRaw, args...); err != nil {
-		return nil, fmt.Errorf("r.db.Select: %w", err)
+		return nil, fmt.Errorf("s.db.Select: %w", err)
 	}
 
 	return result, nil
 }
 
-// GetServerByID ...
-func (s *Store) GetServerByID(ctx context.Context, multiplayer domain.Multiplayer, id string) (Server, error) {
+// GetServer ...
+func (s *Store) GetServer(ctx context.Context, multiplayer domain.Multiplayer, id string) (Server, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 
 	sb = sb.From(serversInfoTableName).
-		Select(multiplayerColumnName, idColumnName, nameColumnName, langColumnName, gamemodeColumnName, urlColumnName, playersColumnName, collectedAtColumnName).
+		Select(multiplayerColumnName, idColumnName, nameColumnName, languageColumnName, gamemodeColumnName, urlColumnName, playersCountColumnName, collectedAtColumnName).
 		Where(
 			sb.And(
 				sb.Equal(multiplayerColumnName, multiplayer),
@@ -151,53 +146,41 @@ func (s *Store) GetServerByID(ctx context.Context, multiplayer domain.Multiplaye
 
 	var srv Server
 	if err := s.db.QueryRow(ctx, sqlRaw, args...).ScanStruct(&srv); err != nil {
-		return Server{}, fmt.Errorf("r.db.QueryRow: %w", err)
+		return Server{}, fmt.Errorf("s.db.QueryRow: %w", err)
 	}
 
 	return srv, nil
 }
 
-// GetServerStatistics ...
-func (s *Store) GetServerStatistics(ctx context.Context, filter domain.ServerStatisticsFilter) ([]ServerStatistic, error) {
+// ListServerStatistics ...
+func (s *Store) ListServerStatistics(ctx context.Context, params domain.ListServerStatisticsParams) ([]ServerStatisticPoint, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 
 	timeSelect := wrapColumn("toStartOfHour", collectedAtColumnName)
-	if filter.Precision == domain.ServerStatisticsFilterPrecisionPerDay {
+	if params.Precision == domain.ServerStatisticsPrecisionPerDay {
 		timeSelect = wrapColumn("toStartOfDay", collectedAtColumnName)
 	}
 
 	sb = sb.
 		From(serversOnlineTableName).
 		Select(
-			sb.As(timeSelect, atColumnName),
-			sb.As(wrapColumn("toInt32", wrapColumn("avg", playersColumnName)), playersColumnName),
+			sb.As(timeSelect, collectedAtColumnName),
+			sb.As(wrapColumn("toInt32", wrapColumn("avg", playersCountColumnName)), playersCountColumnName),
 		).
 		Where(
-			sb.Equal(multiplayerColumnName, string(filter.Multiplayer)),
-			sb.Equal(idColumnName, filter.ID),
+			sb.Equal(multiplayerColumnName, string(params.Multiplayer)),
+			sb.Equal(idColumnName, params.ID),
+			sb.GreaterThan(collectedAtColumnName, params.TimeRange.From),
+			sb.LessThan(collectedAtColumnName, params.TimeRange.To),
 		).
 		GroupBy(collectedAtColumnName).
-		Limit(int(filter.Count))
-
-	if !filter.LastSeen.IsZero() {
-		if filter.TimeOrder == domain.OrderAsc {
-			sb = sb.Where(sb.GreaterThan(collectedAtColumnName, filter.LastSeen))
-		} else {
-			sb = sb.Where(sb.LessThan(collectedAtColumnName, filter.LastSeen))
-		}
-	}
-
-	if filter.TimeOrder == domain.OrderAsc {
-		sb = sb.OrderBy(collectedAtColumnName + " ASC")
-	} else {
-		sb = sb.OrderBy(collectedAtColumnName + " DESC")
-	}
+		OrderBy(collectedAtColumnName + " DESC")
 
 	sqlRaw, args := sql.Build(sb)
 
-	var result []ServerStatistic
+	var result []ServerStatisticPoint
 	if err := s.db.Select(ctx, &result, sqlRaw, args...); err != nil {
-		return nil, fmt.Errorf("r.db.Select: %w", err)
+		return nil, fmt.Errorf("s.db.Select: %w", err)
 	}
 
 	return result, nil

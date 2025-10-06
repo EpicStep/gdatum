@@ -1,49 +1,32 @@
 components:
   responses:
-    GetMultiplayersSummaryOK:
-      description: successful operation
+    ListMultiplayerSummariesOK:
+      description: List of multiplayer platforms
       content:
         application/json:
           schema:
             type: array
             items:
               $ref: "schemas.yml#/components/schemas/MultiplayerSummary"
-    GetServersByMultiplayerOK:
-      description: successful operation
+    ListServerSummariesOK:
+      description: List of server summaries
       content:
         application/json:
           schema:
             type: array
             items:
               $ref: "schemas.yml#/components/schemas/ServerSummary"
-    GetServerByIDOK:
-      description: successful operation
+    GetServerOK:
+      description: Get server
       content:
         application/json:
           schema:
-            type: object
-            required:
-              - name
-            properties:
-              name:
-                type: string
-              url:
-                type: string
-              gamemode:
-                type: string
-              lang:
-                type: string
-              players:
-                type: integer
-                format: int64
-              collected_at:
-                type: string
-                format: date-time
-    GetServerStatisticsByID:
-      description: successful operation
+            $ref: "schemas.yml#/components/schemas/DetailedServer"
+    ListServerStatisticsOK:
+      description: List of server statistics
       content:
         application/json:
           schema:
             type: array
             items:
-              $ref: "schemas.yml#/components/schemas/ServerStatistic"
+              $ref: "schemas.yml#/components/schemas/ServerStatisticPoint"

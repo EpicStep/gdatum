@@ -11,6 +11,6 @@ type Server struct {
 	Name     string `json:"name"`
 	Gamemode string `json:"gamemode"`
 	URL      string `json:"url"`
-	Lang     string `json:"lang"`
+	Language string `json:"lang"`
 	Players  int32  `json:"players"`
 }

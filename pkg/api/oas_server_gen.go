@@ -8,30 +8,30 @@ import (
 
 // Handler handles operations described by OpenAPI v3 specification.
 type Handler interface {
-	// GetMultiplayersSummary implements getMultiplayersSummary operation.
-	//
-	// Get multiplayers summary.
-	//
-	// GET /multiplayers/summary
-	GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) ([]MultiplayerSummary, error)
-	// GetServerByID implements getServerByID operation.
+	// GetServer implements getServer operation.
 	//
 	// Get server by ID.
 	//
 	// GET /multiplayer/{multiplayerName}/server/{serverID}
-	GetServerByID(ctx context.Context, params GetServerByIDParams) (GetServerByIDRes, error)
-	// GetServerStatisticsByID implements getServerStatisticsByID operation.
+	GetServer(ctx context.Context, params GetServerParams) (GetServerRes, error)
+	// ListMultiplayerSummaries implements listMultiplayerSummaries operation.
 	//
-	// Get server stats by ID.
+	// Get a summary of multiplayer platforms.
+	//
+	// GET /multiplayers/summaries
+	ListMultiplayerSummaries(ctx context.Context, params ListMultiplayerSummariesParams) ([]MultiplayerSummary, error)
+	// ListServerStatistics implements listServerStatistics operation.
+	//
+	// Get server statistics by ID.
 	//
 	// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
-	GetServerStatisticsByID(ctx context.Context, params GetServerStatisticsByIDParams) (GetServerStatisticsByIDRes, error)
-	// GetServersByMultiplayer implements getServersByMultiplayer operation.
+	ListServerStatistics(ctx context.Context, params ListServerStatisticsParams) (ListServerStatisticsRes, error)
+	// ListServerSummaries implements listServerSummaries operation.
 	//
-	// Get servers by multiplayer.
+	// List servers for a multiplayer platform.
 	//
 	// GET /multiplayer/{multiplayerName}/servers
-	GetServersByMultiplayer(ctx context.Context, params GetServersByMultiplayerParams) (GetServersByMultiplayerRes, error)
+	ListServerSummaries(ctx context.Context, params ListServerSummariesParams) (ListServerSummariesRes, error)
 }
 
 // Server implements http server based on OpenAPI v3 specification and

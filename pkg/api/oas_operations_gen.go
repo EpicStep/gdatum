@@ -6,8 +6,8 @@ package api
 type OperationName = string
 
 const (
-	GetMultiplayersSummaryOperation  OperationName = "GetMultiplayersSummary"
-	GetServerByIDOperation           OperationName = "GetServerByID"
-	GetServerStatisticsByIDOperation OperationName = "GetServerStatisticsByID"
-	GetServersByMultiplayerOperation OperationName = "GetServersByMultiplayer"
+	GetServerOperation                OperationName = "GetServer"
+	ListMultiplayerSummariesOperation OperationName = "ListMultiplayerSummaries"
+	ListServerStatisticsOperation     OperationName = "ListServerStatistics"
+	ListServerSummariesOperation      OperationName = "ListServerSummaries"
 )

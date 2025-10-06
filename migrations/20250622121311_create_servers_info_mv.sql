@@ -7,10 +7,10 @@ SELECT multiplayer,
        name,
        url,
        gamemode,
-       lang,
+       language,
        collected_at
 FROM servers_metrics_raw
-GROUP BY multiplayer, id, name, url, gamemode, lang, collected_at;
+GROUP BY multiplayer, id, name, url, gamemode, language, collected_at;
 -- +goose StatementEnd
 
 -- +goose Down

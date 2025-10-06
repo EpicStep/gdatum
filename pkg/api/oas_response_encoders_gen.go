@@ -11,7 +11,33 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func encodeGetMultiplayersSummaryResponse(response []MultiplayerSummary, w http.ResponseWriter, span trace.Span) error {
+func encodeGetServerResponse(response GetServerRes, w http.ResponseWriter, span trace.Span) error {
+	switch response := response.(type) {
+	case *DetailedServer:
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.WriteHeader(200)
+		span.SetStatus(codes.Ok, http.StatusText(200))
+
+		e := new(jx.Encoder)
+		response.Encode(e)
+		if _, err := e.WriteTo(w); err != nil {
+			return errors.Wrap(err, "write")
+		}
+
+		return nil
+
+	case *GetServerNotFound:
+		w.WriteHeader(404)
+		span.SetStatus(codes.Error, http.StatusText(404))
+
+		return nil
+
+	default:
+		return errors.Errorf("unexpected response type: %T", response)
+	}
+}
+
+func encodeListMultiplayerSummariesResponse(response []MultiplayerSummary, w http.ResponseWriter, span trace.Span) error {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(200)
 	span.SetStatus(codes.Ok, http.StatusText(200))
@@ -29,9 +55,9 @@ func encodeGetMultiplayersSummaryResponse(response []MultiplayerSummary, w http.
 	return nil
 }
 
-func encodeGetServerByIDResponse(response GetServerByIDRes, w http.ResponseWriter, span trace.Span) error {
+func encodeListServerStatisticsResponse(response ListServerStatisticsRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetServerByIDOK:
+	case *ListServerStatisticsOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -44,7 +70,7 @@ func encodeGetServerByIDResponse(response GetServerByIDRes, w http.ResponseWrite
 
 		return nil
 
-	case *GetServerByIDNotFound:
+	case *ListServerStatisticsNotFound:
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
 
@@ -55,9 +81,9 @@ func encodeGetServerByIDResponse(response GetServerByIDRes, w http.ResponseWrite
 	}
 }
 
-func encodeGetServerStatisticsByIDResponse(response GetServerStatisticsByIDRes, w http.ResponseWriter, span trace.Span) error {
+func encodeListServerSummariesResponse(response ListServerSummariesRes, w http.ResponseWriter, span trace.Span) error {
 	switch response := response.(type) {
-	case *GetServerStatisticsByIDOKApplicationJSON:
+	case *ListServerSummariesOKApplicationJSON:
 		w.Header().Set("Content-Type", "application/json; charset=utf-8")
 		w.WriteHeader(200)
 		span.SetStatus(codes.Ok, http.StatusText(200))
@@ -70,33 +96,7 @@ func encodeGetServerStatisticsByIDResponse(response GetServerStatisticsByIDRes, 
 
 		return nil
 
-	case *GetServerStatisticsByIDNotFound:
-		w.WriteHeader(404)
-		span.SetStatus(codes.Error, http.StatusText(404))
-
-		return nil
-
-	default:
-		return errors.Errorf("unexpected response type: %T", response)
-	}
-}
-
-func encodeGetServersByMultiplayerResponse(response GetServersByMultiplayerRes, w http.ResponseWriter, span trace.Span) error {
-	switch response := response.(type) {
-	case *GetServersByMultiplayerOKApplicationJSON:
-		w.Header().Set("Content-Type", "application/json; charset=utf-8")
-		w.WriteHeader(200)
-		span.SetStatus(codes.Ok, http.StatusText(200))
-
-		e := new(jx.Encoder)
-		response.Encode(e)
-		if _, err := e.WriteTo(w); err != nil {
-			return errors.Wrap(err, "write")
-		}
-
-		return nil
-
-	case *GetServersByMultiplayerNotFound:
+	case *ListServerSummariesNotFound:
 		w.WriteHeader(404)
 		span.SetStatus(codes.Error, http.StatusText(404))
 

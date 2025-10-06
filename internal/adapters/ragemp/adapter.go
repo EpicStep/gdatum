@@ -43,13 +43,13 @@ func (a *Adapter) Servers(ctx context.Context, collectedAt time.Time) ([]domain.
 		}
 
 		return domain.Server{
-			Multiplayer: domain.MultiplayerRagemp,
-			ID:          ip,
-			Name:        server.Name,
-			Gamemode:    server.Gamemode,
-			Lang:        server.Lang,
-			Players:     server.Players,
-			CollectedAt: collectedAt,
+			Multiplayer:  domain.MultiplayerRagemp,
+			ID:           ip,
+			Name:         server.Name,
+			Gamemode:     server.Gamemode,
+			Language:     server.Language,
+			PlayersCount: server.Players,
+			CollectedAt:  collectedAt,
 		}
 	}), nil
 }

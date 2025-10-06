@@ -28,105 +28,116 @@ func New(repo domain.Repository) *Handlers {
 	}
 }
 
-// GetMultiplayersSummary ...
-func (h *Handlers) GetMultiplayersSummary(ctx context.Context, params api.GetMultiplayersSummaryParams) ([]api.MultiplayerSummary, error) {
-	summary, err := h.repo.GetMultiplayersSummary(ctx, orderToDomain(params.PlayersOrder.Value))
+// ListMultiplayerSummaries ...
+func (h *Handlers) ListMultiplayerSummaries(ctx context.Context, params api.ListMultiplayerSummariesParams) ([]api.MultiplayerSummary, error) {
+	summary, err := h.repo.ListMultiplayerSummaries(ctx, params.PlayersOrderAsc.Value)
 	if err != nil {
-		return nil, fmt.Errorf("h.repo.GetMultiplayersSummary: %w", err)
+		return nil, fmt.Errorf("h.repo.ListMultiplayerSummaries: %w", err)
 	}
 
 	return lo.Map(summary, func(multiplayer domain.MultiplayerSummary, _ int) api.MultiplayerSummary {
 		return api.MultiplayerSummary{
-			Name:    string(multiplayer.Name),
-			Players: multiplayer.Players,
+			Name:         string(multiplayer.Name),
+			PlayersCount: multiplayer.PlayersCount,
 		}
 	}), nil
 }
 
-// GetServersByMultiplayer ...
-func (h *Handlers) GetServersByMultiplayer(ctx context.Context, params api.GetServersByMultiplayerParams) (api.GetServersByMultiplayerRes, error) {
-	servers, err := h.repo.GetServersByMultiplayer(ctx, domain.ServersByMultiplayerFilter{
-		Multiplayer:    domain.Multiplayer(params.MultiplayerName),
-		Count:          params.Count.Value,
-		PlayersOrder:   orderToDomain(params.PlayersOrder.Value),
-		IncludeOffline: params.IncludeOffline.Value,
+// ListServerSummaries ...
+func (h *Handlers) ListServerSummaries(ctx context.Context, params api.ListServerSummariesParams) (api.ListServerSummariesRes, error) {
+	servers, err := h.repo.ListServerSummaries(ctx, domain.ListServerSummariesParams{
+		Multiplayer:     domain.Multiplayer(params.MultiplayerName),
+		IncludeOffline:  params.IncludeOffline.Value,
+		PlayersOrderAsc: params.PlayersOrderAsc.Value,
+		Limit:           params.Limit.Value,
+		Offset:          params.Offset.Value,
 	})
 	if err != nil {
-		return nil, fmt.Errorf("h.repo.GetServersByMultiplayer: %w", err)
+		return nil, fmt.Errorf("h.repo.ListServerSummaries: %w", err)
 	}
 
-	resp := api.GetServersByMultiplayerOKApplicationJSON(lo.Map(servers, func(server domain.ServerSummary, _ int) api.ServerSummary {
+	resp := api.ListServerSummariesOKApplicationJSON(lo.Map(servers, func(server domain.ServerSummary, _ int) api.ServerSummary {
 		return api.ServerSummary{
-			ID:      server.ID,
-			Name:    server.Name,
-			Players: server.Players,
+			ID:           server.ID,
+			Name:         server.Name,
+			PlayersCount: server.PlayersCount,
 		}
 	}))
 
 	return &resp, nil
 }
 
-// GetServerByID ...
-func (h *Handlers) GetServerByID(ctx context.Context, params api.GetServerByIDParams) (api.GetServerByIDRes, error) {
-	server, err := h.repo.GetServerByID(ctx, domain.Multiplayer(params.MultiplayerName), params.ServerID)
+// GetServer ...
+func (h *Handlers) GetServer(ctx context.Context, params api.GetServerParams) (api.GetServerRes, error) {
+	server, err := h.repo.GetServer(ctx, domain.Multiplayer(params.MultiplayerName), params.ServerID)
 	if err != nil {
 		if errors.Is(err, domain.ErrServerNotFound) {
-			return &api.GetServerByIDNotFound{}, nil
+			return &api.GetServerNotFound{}, nil
 		}
 
-		return nil, fmt.Errorf("h.repo.GetServerByID: %w", err)
+		return nil, fmt.Errorf("h.repo.GetServer: %w", err)
 	}
 
-	return &api.GetServerByIDOK{
-		Name:        server.Name,
-		URL:         api.NewOptString(server.URL),
-		Gamemode:    api.NewOptString(server.Gamemode),
-		Lang:        api.NewOptString(server.Lang),
-		Players:     api.NewOptInt64(int64(server.Players)),
-		CollectedAt: api.NewOptDateTime(server.CollectedAt),
-	}, nil
+	return bindDetailedServer(server), nil
 }
 
-// GetServerStatisticsByID ...
-func (h *Handlers) GetServerStatisticsByID(ctx context.Context, params api.GetServerStatisticsByIDParams) (api.GetServerStatisticsByIDRes, error) {
-	statistics, err := h.repo.GetServerStatistics(ctx, domain.ServerStatisticsFilter{
+// ListServerStatistics ...
+func (h *Handlers) ListServerStatistics(ctx context.Context, params api.ListServerStatisticsParams) (api.ListServerStatisticsRes, error) {
+	statistics, err := h.repo.ListServerStatistics(ctx, domain.ListServerStatisticsParams{
 		Multiplayer: domain.Multiplayer(params.MultiplayerName),
 		ID:          params.ServerID,
-		TimeOrder:   orderToDomain(params.TimeOrder.Value),
-		Count:       params.Count.Value,
-		LastSeen:    params.LastSeen.Value,
-		Precision:   precisionToDomain(params.Precision.Value),
+		TimeRange: domain.TimeRange{
+			From: params.From,
+			To:   params.To,
+		},
+		Precision: precisionToDomain(params.Precision.Value),
 	})
 	if err != nil {
 		if errors.Is(err, domain.ErrServerNotFound) {
-			return &api.GetServerStatisticsByIDNotFound{}, nil
+			return &api.ListServerStatisticsNotFound{}, nil
 		}
 
-		return nil, fmt.Errorf("h.repo.GetServerStatisticsByID: %w", err)
+		return nil, fmt.Errorf("h.repo.ListServerStatistics: %w", err)
 	}
 
-	resp := api.GetServerStatisticsByIDOKApplicationJSON(lo.Map(statistics, func(stat domain.ServerStatistic, _ int) api.ServerStatistic {
-		return api.ServerStatistic{
-			At:      stat.At,
-			Players: stat.Players,
+	resp := api.ListServerStatisticsOKApplicationJSON(lo.Map(statistics, func(point domain.ServerStatisticPoint, _ int) api.ServerStatisticPoint {
+		return api.ServerStatisticPoint{
+			CollectedAt:  point.CollectedAt,
+			PlayersCount: point.PlayersCount,
 		}
 	}))
 
 	return &resp, nil
 }
 
-func orderToDomain(order api.Order) domain.Order {
-	if order == api.OrderAsc {
-		return domain.OrderAsc
+func precisionToDomain(precision api.ListServerStatisticsPrecision) domain.ServerStatisticsPrecision {
+	if precision == api.ListServerStatisticsPrecisionPerDay {
+		return domain.ServerStatisticsPrecisionPerDay
 	}
 
-	return domain.OrderDesc
+	return domain.ServerStatisticsPrecisionPerHour
 }
 
-func precisionToDomain(precision api.GetServerStatisticsByIDPrecision) domain.ServerStatisticsFilterPrecision {
-	if precision == api.GetServerStatisticsByIDPrecisionPerDay {
-		return domain.ServerStatisticsFilterPrecisionPerDay
+func bindDetailedServer(server domain.Server) *api.DetailedServer {
+	result := &api.DetailedServer{
+		Name: server.Name,
 	}
 
-	return domain.ServerStatisticsFilterPrecisionPerHour
+	if server.URL != "" {
+		result.URL = api.NewOptString(server.URL)
+	}
+
+	if server.Gamemode != "" {
+		result.Gamemode = api.NewOptString(server.Gamemode)
+	}
+
+	if server.Language != "" {
+		result.Language = api.NewOptString(server.Language)
+	}
+
+	if server.PlayersCount > 0 {
+		result.PlayersCount = api.NewOptInt64(int64(server.PlayersCount))
+	}
+
+	return result
 }

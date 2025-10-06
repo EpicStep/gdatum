@@ -15,33 +15,33 @@ const (
 	MultiplayerRagemp = "ragemp"
 )
 
-// Server ...
-type Server struct {
-	Multiplayer Multiplayer
-	ID          string
-	Name        string
-	URL         string
-	Gamemode    string
-	Lang        string
-	Players     int32
-	CollectedAt time.Time
-}
-
 // MultiplayerSummary ...
 type MultiplayerSummary struct {
-	Name    Multiplayer
-	Players int64
+	Name         Multiplayer
+	PlayersCount int64
 }
 
-// ServerStatistic ..
-type ServerStatistic struct {
-	Players int32
-	At      time.Time
+// ServerStatisticPoint represents a single data point in a graph.
+type ServerStatisticPoint struct {
+	PlayersCount int32
+	CollectedAt  time.Time
+}
+
+// Server ...
+type Server struct {
+	Multiplayer  Multiplayer
+	ID           string
+	Name         string
+	URL          string
+	Gamemode     string
+	Language     string
+	PlayersCount int32
+	CollectedAt  time.Time
 }
 
 // ServerSummary ...
 type ServerSummary struct {
-	ID      string
-	Name    string
-	Players int32
+	ID           string
+	Name         string
+	PlayersCount int32
 }

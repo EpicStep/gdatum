@@ -72,7 +72,7 @@ func (h *Handler) collect(ctx context.Context) []domain.Server {
 				zap.Int("count", len(collectedServers)),
 			)
 
-			h.serversCollectedGauge.
+			h.serversCollected.
 				WithLabelValues(string(collector.Multiplayer)).
 				Set(float64(len(collectedServers)))
 

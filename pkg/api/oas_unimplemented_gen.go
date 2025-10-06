@@ -13,38 +13,38 @@ type UnimplementedHandler struct{}
 
 var _ Handler = UnimplementedHandler{}
 
-// GetMultiplayersSummary implements getMultiplayersSummary operation.
-//
-// Get multiplayers summary.
-//
-// GET /multiplayers/summary
-func (UnimplementedHandler) GetMultiplayersSummary(ctx context.Context, params GetMultiplayersSummaryParams) (r []MultiplayerSummary, _ error) {
-	return r, ht.ErrNotImplemented
-}
-
-// GetServerByID implements getServerByID operation.
+// GetServer implements getServer operation.
 //
 // Get server by ID.
 //
 // GET /multiplayer/{multiplayerName}/server/{serverID}
-func (UnimplementedHandler) GetServerByID(ctx context.Context, params GetServerByIDParams) (r GetServerByIDRes, _ error) {
+func (UnimplementedHandler) GetServer(ctx context.Context, params GetServerParams) (r GetServerRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// GetServerStatisticsByID implements getServerStatisticsByID operation.
+// ListMultiplayerSummaries implements listMultiplayerSummaries operation.
 //
-// Get server stats by ID.
+// Get a summary of multiplayer platforms.
+//
+// GET /multiplayers/summaries
+func (UnimplementedHandler) ListMultiplayerSummaries(ctx context.Context, params ListMultiplayerSummariesParams) (r []MultiplayerSummary, _ error) {
+	return r, ht.ErrNotImplemented
+}
+
+// ListServerStatistics implements listServerStatistics operation.
+//
+// Get server statistics by ID.
 //
 // GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
-func (UnimplementedHandler) GetServerStatisticsByID(ctx context.Context, params GetServerStatisticsByIDParams) (r GetServerStatisticsByIDRes, _ error) {
+func (UnimplementedHandler) ListServerStatistics(ctx context.Context, params ListServerStatisticsParams) (r ListServerStatisticsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
 
-// GetServersByMultiplayer implements getServersByMultiplayer operation.
+// ListServerSummaries implements listServerSummaries operation.
 //
-// Get servers by multiplayer.
+// List servers for a multiplayer platform.
 //
 // GET /multiplayer/{multiplayerName}/servers
-func (UnimplementedHandler) GetServersByMultiplayer(ctx context.Context, params GetServersByMultiplayerParams) (r GetServersByMultiplayerRes, _ error) {
+func (UnimplementedHandler) ListServerSummaries(ctx context.Context, params ListServerSummariesParams) (r ListServerSummariesRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

@@ -8,112 +8,113 @@ import (
 	"github.com/go-faster/errors"
 )
 
-// GetServerByIDNotFound is response for GetServerByID operation.
-type GetServerByIDNotFound struct{}
-
-func (*GetServerByIDNotFound) getServerByIDRes() {}
-
-type GetServerByIDOK struct {
-	Name        string      `json:"name"`
-	URL         OptString   `json:"url"`
-	Gamemode    OptString   `json:"gamemode"`
-	Lang        OptString   `json:"lang"`
-	Players     OptInt64    `json:"players"`
-	CollectedAt OptDateTime `json:"collected_at"`
+// Ref: #/components/schemas/DetailedServer
+type DetailedServer struct {
+	Name         string      `json:"name"`
+	URL          OptString   `json:"url"`
+	Gamemode     OptString   `json:"gamemode"`
+	Language     OptString   `json:"language"`
+	PlayersCount OptInt64    `json:"playersCount"`
+	CollectedAt  OptDateTime `json:"collectedAt"`
 }
 
 // GetName returns the value of Name.
-func (s *GetServerByIDOK) GetName() string {
+func (s *DetailedServer) GetName() string {
 	return s.Name
 }
 
 // GetURL returns the value of URL.
-func (s *GetServerByIDOK) GetURL() OptString {
+func (s *DetailedServer) GetURL() OptString {
 	return s.URL
 }
 
 // GetGamemode returns the value of Gamemode.
-func (s *GetServerByIDOK) GetGamemode() OptString {
+func (s *DetailedServer) GetGamemode() OptString {
 	return s.Gamemode
 }
 
-// GetLang returns the value of Lang.
-func (s *GetServerByIDOK) GetLang() OptString {
-	return s.Lang
+// GetLanguage returns the value of Language.
+func (s *DetailedServer) GetLanguage() OptString {
+	return s.Language
 }
 
-// GetPlayers returns the value of Players.
-func (s *GetServerByIDOK) GetPlayers() OptInt64 {
-	return s.Players
+// GetPlayersCount returns the value of PlayersCount.
+func (s *DetailedServer) GetPlayersCount() OptInt64 {
+	return s.PlayersCount
 }
 
 // GetCollectedAt returns the value of CollectedAt.
-func (s *GetServerByIDOK) GetCollectedAt() OptDateTime {
+func (s *DetailedServer) GetCollectedAt() OptDateTime {
 	return s.CollectedAt
 }
 
 // SetName sets the value of Name.
-func (s *GetServerByIDOK) SetName(val string) {
+func (s *DetailedServer) SetName(val string) {
 	s.Name = val
 }
 
 // SetURL sets the value of URL.
-func (s *GetServerByIDOK) SetURL(val OptString) {
+func (s *DetailedServer) SetURL(val OptString) {
 	s.URL = val
 }
 
 // SetGamemode sets the value of Gamemode.
-func (s *GetServerByIDOK) SetGamemode(val OptString) {
+func (s *DetailedServer) SetGamemode(val OptString) {
 	s.Gamemode = val
 }
 
-// SetLang sets the value of Lang.
-func (s *GetServerByIDOK) SetLang(val OptString) {
-	s.Lang = val
+// SetLanguage sets the value of Language.
+func (s *DetailedServer) SetLanguage(val OptString) {
+	s.Language = val
 }
 
-// SetPlayers sets the value of Players.
-func (s *GetServerByIDOK) SetPlayers(val OptInt64) {
-	s.Players = val
+// SetPlayersCount sets the value of PlayersCount.
+func (s *DetailedServer) SetPlayersCount(val OptInt64) {
+	s.PlayersCount = val
 }
 
 // SetCollectedAt sets the value of CollectedAt.
-func (s *GetServerByIDOK) SetCollectedAt(val OptDateTime) {
+func (s *DetailedServer) SetCollectedAt(val OptDateTime) {
 	s.CollectedAt = val
 }
 
-func (*GetServerByIDOK) getServerByIDRes() {}
+func (*DetailedServer) getServerRes() {}
 
-// GetServerStatisticsByIDNotFound is response for GetServerStatisticsByID operation.
-type GetServerStatisticsByIDNotFound struct{}
+// GetServerNotFound is response for GetServer operation.
+type GetServerNotFound struct{}
 
-func (*GetServerStatisticsByIDNotFound) getServerStatisticsByIDRes() {}
+func (*GetServerNotFound) getServerRes() {}
 
-type GetServerStatisticsByIDOKApplicationJSON []ServerStatistic
+// ListServerStatisticsNotFound is response for ListServerStatistics operation.
+type ListServerStatisticsNotFound struct{}
 
-func (*GetServerStatisticsByIDOKApplicationJSON) getServerStatisticsByIDRes() {}
+func (*ListServerStatisticsNotFound) listServerStatisticsRes() {}
 
-type GetServerStatisticsByIDPrecision string
+type ListServerStatisticsOKApplicationJSON []ServerStatisticPoint
+
+func (*ListServerStatisticsOKApplicationJSON) listServerStatisticsRes() {}
+
+type ListServerStatisticsPrecision string
 
 const (
-	GetServerStatisticsByIDPrecisionPerHour GetServerStatisticsByIDPrecision = "perHour"
-	GetServerStatisticsByIDPrecisionPerDay  GetServerStatisticsByIDPrecision = "perDay"
+	ListServerStatisticsPrecisionPerHour ListServerStatisticsPrecision = "perHour"
+	ListServerStatisticsPrecisionPerDay  ListServerStatisticsPrecision = "perDay"
 )
 
-// AllValues returns all GetServerStatisticsByIDPrecision values.
-func (GetServerStatisticsByIDPrecision) AllValues() []GetServerStatisticsByIDPrecision {
-	return []GetServerStatisticsByIDPrecision{
-		GetServerStatisticsByIDPrecisionPerHour,
-		GetServerStatisticsByIDPrecisionPerDay,
+// AllValues returns all ListServerStatisticsPrecision values.
+func (ListServerStatisticsPrecision) AllValues() []ListServerStatisticsPrecision {
+	return []ListServerStatisticsPrecision{
+		ListServerStatisticsPrecisionPerHour,
+		ListServerStatisticsPrecisionPerDay,
 	}
 }
 
 // MarshalText implements encoding.TextMarshaler.
-func (s GetServerStatisticsByIDPrecision) MarshalText() ([]byte, error) {
+func (s ListServerStatisticsPrecision) MarshalText() ([]byte, error) {
 	switch s {
-	case GetServerStatisticsByIDPrecisionPerHour:
+	case ListServerStatisticsPrecisionPerHour:
 		return []byte(s), nil
-	case GetServerStatisticsByIDPrecisionPerDay:
+	case ListServerStatisticsPrecisionPerDay:
 		return []byte(s), nil
 	default:
 		return nil, errors.Errorf("invalid value: %q", s)
@@ -121,33 +122,33 @@ func (s GetServerStatisticsByIDPrecision) MarshalText() ([]byte, error) {
 }
 
 // UnmarshalText implements encoding.TextUnmarshaler.
-func (s *GetServerStatisticsByIDPrecision) UnmarshalText(data []byte) error {
-	switch GetServerStatisticsByIDPrecision(data) {
-	case GetServerStatisticsByIDPrecisionPerHour:
-		*s = GetServerStatisticsByIDPrecisionPerHour
+func (s *ListServerStatisticsPrecision) UnmarshalText(data []byte) error {
+	switch ListServerStatisticsPrecision(data) {
+	case ListServerStatisticsPrecisionPerHour:
+		*s = ListServerStatisticsPrecisionPerHour
 		return nil
-	case GetServerStatisticsByIDPrecisionPerDay:
-		*s = GetServerStatisticsByIDPrecisionPerDay
+	case ListServerStatisticsPrecisionPerDay:
+		*s = ListServerStatisticsPrecisionPerDay
 		return nil
 	default:
 		return errors.Errorf("invalid value: %q", data)
 	}
 }
 
-// GetServersByMultiplayerNotFound is response for GetServersByMultiplayer operation.
-type GetServersByMultiplayerNotFound struct{}
+// ListServerSummariesNotFound is response for ListServerSummaries operation.
+type ListServerSummariesNotFound struct{}
 
-func (*GetServersByMultiplayerNotFound) getServersByMultiplayerRes() {}
+func (*ListServerSummariesNotFound) listServerSummariesRes() {}
 
-type GetServersByMultiplayerOKApplicationJSON []ServerSummary
+type ListServerSummariesOKApplicationJSON []ServerSummary
 
-func (*GetServersByMultiplayerOKApplicationJSON) getServersByMultiplayerRes() {}
+func (*ListServerSummariesOKApplicationJSON) listServerSummariesRes() {}
 
 // Ref: #/components/schemas/MultiplayerSummary
 type MultiplayerSummary struct {
-	// Name of a multiplayer.
-	Name    string `json:"name"`
-	Players int64  `json:"players"`
+	// Multiplayer platform name.
+	Name         string `json:"name"`
+	PlayersCount int64  `json:"playersCount"`
 }
 
 // GetName returns the value of Name.
@@ -155,9 +156,9 @@ func (s *MultiplayerSummary) GetName() string {
 	return s.Name
 }
 
-// GetPlayers returns the value of Players.
-func (s *MultiplayerSummary) GetPlayers() int64 {
-	return s.Players
+// GetPlayersCount returns the value of PlayersCount.
+func (s *MultiplayerSummary) GetPlayersCount() int64 {
+	return s.PlayersCount
 }
 
 // SetName sets the value of Name.
@@ -165,9 +166,9 @@ func (s *MultiplayerSummary) SetName(val string) {
 	s.Name = val
 }
 
-// SetPlayers sets the value of Players.
-func (s *MultiplayerSummary) SetPlayers(val int64) {
-	s.Players = val
+// SetPlayersCount sets the value of PlayersCount.
+func (s *MultiplayerSummary) SetPlayersCount(val int64) {
+	s.PlayersCount = val
 }
 
 // NewOptBool returns new OptBool with value set to v.
@@ -256,52 +257,6 @@ func (o OptDateTime) Get() (v time.Time, ok bool) {
 
 // Or returns value if set, or given parameter if does not.
 func (o OptDateTime) Or(d time.Time) time.Time {
-	if v, ok := o.Get(); ok {
-		return v
-	}
-	return d
-}
-
-// NewOptGetServerStatisticsByIDPrecision returns new OptGetServerStatisticsByIDPrecision with value set to v.
-func NewOptGetServerStatisticsByIDPrecision(v GetServerStatisticsByIDPrecision) OptGetServerStatisticsByIDPrecision {
-	return OptGetServerStatisticsByIDPrecision{
-		Value: v,
-		Set:   true,
-	}
-}
-
-// OptGetServerStatisticsByIDPrecision is optional GetServerStatisticsByIDPrecision.
-type OptGetServerStatisticsByIDPrecision struct {
-	Value GetServerStatisticsByIDPrecision
-	Set   bool
-}
-
-// IsSet returns true if OptGetServerStatisticsByIDPrecision was set.
-func (o OptGetServerStatisticsByIDPrecision) IsSet() bool { return o.Set }
-
-// Reset unsets value.
-func (o *OptGetServerStatisticsByIDPrecision) Reset() {
-	var v GetServerStatisticsByIDPrecision
-	o.Value = v
-	o.Set = false
-}
-
-// SetTo sets value to v.
-func (o *OptGetServerStatisticsByIDPrecision) SetTo(v GetServerStatisticsByIDPrecision) {
-	o.Set = true
-	o.Value = v
-}
-
-// Get returns value and boolean that denotes whether value was set.
-func (o OptGetServerStatisticsByIDPrecision) Get() (v GetServerStatisticsByIDPrecision, ok bool) {
-	if !o.Set {
-		return v, false
-	}
-	return o.Value, true
-}
-
-// Or returns value if set, or given parameter if does not.
-func (o OptGetServerStatisticsByIDPrecision) Or(d GetServerStatisticsByIDPrecision) GetServerStatisticsByIDPrecision {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -400,38 +355,38 @@ func (o OptInt64) Or(d int64) int64 {
 	return d
 }
 
-// NewOptOrder returns new OptOrder with value set to v.
-func NewOptOrder(v Order) OptOrder {
-	return OptOrder{
+// NewOptListServerStatisticsPrecision returns new OptListServerStatisticsPrecision with value set to v.
+func NewOptListServerStatisticsPrecision(v ListServerStatisticsPrecision) OptListServerStatisticsPrecision {
+	return OptListServerStatisticsPrecision{
 		Value: v,
 		Set:   true,
 	}
 }
 
-// OptOrder is optional Order.
-type OptOrder struct {
-	Value Order
+// OptListServerStatisticsPrecision is optional ListServerStatisticsPrecision.
+type OptListServerStatisticsPrecision struct {
+	Value ListServerStatisticsPrecision
 	Set   bool
 }
 
-// IsSet returns true if OptOrder was set.
-func (o OptOrder) IsSet() bool { return o.Set }
+// IsSet returns true if OptListServerStatisticsPrecision was set.
+func (o OptListServerStatisticsPrecision) IsSet() bool { return o.Set }
 
 // Reset unsets value.
-func (o *OptOrder) Reset() {
-	var v Order
+func (o *OptListServerStatisticsPrecision) Reset() {
+	var v ListServerStatisticsPrecision
 	o.Value = v
 	o.Set = false
 }
 
 // SetTo sets value to v.
-func (o *OptOrder) SetTo(v Order) {
+func (o *OptListServerStatisticsPrecision) SetTo(v ListServerStatisticsPrecision) {
 	o.Set = true
 	o.Value = v
 }
 
 // Get returns value and boolean that denotes whether value was set.
-func (o OptOrder) Get() (v Order, ok bool) {
+func (o OptListServerStatisticsPrecision) Get() (v ListServerStatisticsPrecision, ok bool) {
 	if !o.Set {
 		return v, false
 	}
@@ -439,7 +394,7 @@ func (o OptOrder) Get() (v Order, ok bool) {
 }
 
 // Or returns value if set, or given parameter if does not.
-func (o OptOrder) Or(d Order) Order {
+func (o OptListServerStatisticsPrecision) Or(d ListServerStatisticsPrecision) ListServerStatisticsPrecision {
 	if v, ok := o.Get(); ok {
 		return v
 	}
@@ -492,79 +447,37 @@ func (o OptString) Or(d string) string {
 	return d
 }
 
-// Ref: #/components/schemas/Order
-type Order string
-
-const (
-	OrderAsc  Order = "asc"
-	OrderDesc Order = "desc"
-)
-
-// AllValues returns all Order values.
-func (Order) AllValues() []Order {
-	return []Order{
-		OrderAsc,
-		OrderDesc,
-	}
+// Ref: #/components/schemas/ServerStatisticPoint
+type ServerStatisticPoint struct {
+	CollectedAt  time.Time `json:"collectedAt"`
+	PlayersCount int32     `json:"playersCount"`
 }
 
-// MarshalText implements encoding.TextMarshaler.
-func (s Order) MarshalText() ([]byte, error) {
-	switch s {
-	case OrderAsc:
-		return []byte(s), nil
-	case OrderDesc:
-		return []byte(s), nil
-	default:
-		return nil, errors.Errorf("invalid value: %q", s)
-	}
+// GetCollectedAt returns the value of CollectedAt.
+func (s *ServerStatisticPoint) GetCollectedAt() time.Time {
+	return s.CollectedAt
 }
 
-// UnmarshalText implements encoding.TextUnmarshaler.
-func (s *Order) UnmarshalText(data []byte) error {
-	switch Order(data) {
-	case OrderAsc:
-		*s = OrderAsc
-		return nil
-	case OrderDesc:
-		*s = OrderDesc
-		return nil
-	default:
-		return errors.Errorf("invalid value: %q", data)
-	}
+// GetPlayersCount returns the value of PlayersCount.
+func (s *ServerStatisticPoint) GetPlayersCount() int32 {
+	return s.PlayersCount
 }
 
-// Ref: #/components/schemas/ServerStatistic
-type ServerStatistic struct {
-	At      time.Time `json:"at"`
-	Players int32     `json:"players"`
+// SetCollectedAt sets the value of CollectedAt.
+func (s *ServerStatisticPoint) SetCollectedAt(val time.Time) {
+	s.CollectedAt = val
 }
 
-// GetAt returns the value of At.
-func (s *ServerStatistic) GetAt() time.Time {
-	return s.At
-}
-
-// GetPlayers returns the value of Players.
-func (s *ServerStatistic) GetPlayers() int32 {
-	return s.Players
-}
-
-// SetAt sets the value of At.
-func (s *ServerStatistic) SetAt(val time.Time) {
-	s.At = val
-}
-
-// SetPlayers sets the value of Players.
-func (s *ServerStatistic) SetPlayers(val int32) {
-	s.Players = val
+// SetPlayersCount sets the value of PlayersCount.
+func (s *ServerStatisticPoint) SetPlayersCount(val int32) {
+	s.PlayersCount = val
 }
 
 // Ref: #/components/schemas/ServerSummary
 type ServerSummary struct {
-	ID      string `json:"id"`
-	Name    string `json:"name"`
-	Players int32  `json:"players"`
+	ID           string `json:"id"`
+	Name         string `json:"name"`
+	PlayersCount int32  `json:"playersCount"`
 }
 
 // GetID returns the value of ID.
@@ -577,9 +490,9 @@ func (s *ServerSummary) GetName() string {
 	return s.Name
 }
 
-// GetPlayers returns the value of Players.
-func (s *ServerSummary) GetPlayers() int32 {
-	return s.Players
+// GetPlayersCount returns the value of PlayersCount.
+func (s *ServerSummary) GetPlayersCount() int32 {
+	return s.PlayersCount
 }
 
 // SetID sets the value of ID.
@@ -592,7 +505,7 @@ func (s *ServerSummary) SetName(val string) {
 	s.Name = val
 }
 
-// SetPlayers sets the value of Players.
-func (s *ServerSummary) SetPlayers(val int32) {
-	s.Players = val
+// SetPlayersCount sets the value of PlayersCount.
+func (s *ServerSummary) SetPlayersCount(val int32) {
+	s.PlayersCount = val
 }

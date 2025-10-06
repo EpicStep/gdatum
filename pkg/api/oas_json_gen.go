@@ -9,20 +9,19 @@ import (
 
 	"github.com/go-faster/errors"
 	"github.com/go-faster/jx"
-
 	"github.com/ogen-go/ogen/json"
 	"github.com/ogen-go/ogen/validate"
 )
 
 // Encode implements json.Marshaler.
-func (s *GetServerByIDOK) Encode(e *jx.Encoder) {
+func (s *DetailedServer) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *GetServerByIDOK) encodeFields(e *jx.Encoder) {
+func (s *DetailedServer) encodeFields(e *jx.Encoder) {
 	{
 		e.FieldStart("name")
 		e.Str(s.Name)
@@ -40,38 +39,38 @@ func (s *GetServerByIDOK) encodeFields(e *jx.Encoder) {
 		}
 	}
 	{
-		if s.Lang.Set {
-			e.FieldStart("lang")
-			s.Lang.Encode(e)
+		if s.Language.Set {
+			e.FieldStart("language")
+			s.Language.Encode(e)
 		}
 	}
 	{
-		if s.Players.Set {
-			e.FieldStart("players")
-			s.Players.Encode(e)
+		if s.PlayersCount.Set {
+			e.FieldStart("playersCount")
+			s.PlayersCount.Encode(e)
 		}
 	}
 	{
 		if s.CollectedAt.Set {
-			e.FieldStart("collected_at")
+			e.FieldStart("collectedAt")
 			s.CollectedAt.Encode(e, json.EncodeDateTime)
 		}
 	}
 }
 
-var jsonFieldsNameOfGetServerByIDOK = [6]string{
+var jsonFieldsNameOfDetailedServer = [6]string{
 	0: "name",
 	1: "url",
 	2: "gamemode",
-	3: "lang",
-	4: "players",
-	5: "collected_at",
+	3: "language",
+	4: "playersCount",
+	5: "collectedAt",
 }
 
-// Decode decodes GetServerByIDOK from json.
-func (s *GetServerByIDOK) Decode(d *jx.Decoder) error {
+// Decode decodes DetailedServer from json.
+func (s *DetailedServer) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetServerByIDOK to nil")
+		return errors.New("invalid: unable to decode DetailedServer to nil")
 	}
 	var requiredBitSet [1]uint8
 
@@ -109,27 +108,27 @@ func (s *GetServerByIDOK) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"gamemode\"")
 			}
-		case "lang":
+		case "language":
 			if err := func() error {
-				s.Lang.Reset()
-				if err := s.Lang.Decode(d); err != nil {
+				s.Language.Reset()
+				if err := s.Language.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"lang\"")
+				return errors.Wrap(err, "decode field \"language\"")
 			}
-		case "players":
+		case "playersCount":
 			if err := func() error {
-				s.Players.Reset()
-				if err := s.Players.Decode(d); err != nil {
+				s.PlayersCount.Reset()
+				if err := s.PlayersCount.Decode(d); err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"players\"")
+				return errors.Wrap(err, "decode field \"playersCount\"")
 			}
-		case "collected_at":
+		case "collectedAt":
 			if err := func() error {
 				s.CollectedAt.Reset()
 				if err := s.CollectedAt.Decode(d, json.DecodeDateTime); err != nil {
@@ -137,14 +136,14 @@ func (s *GetServerByIDOK) Decode(d *jx.Decoder) error {
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"collected_at\"")
+				return errors.Wrap(err, "decode field \"collectedAt\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode GetServerByIDOK")
+		return errors.Wrap(err, "decode DetailedServer")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -161,8 +160,8 @@ func (s *GetServerByIDOK) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfGetServerByIDOK) {
-					name = jsonFieldsNameOfGetServerByIDOK[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfDetailedServer) {
+					name = jsonFieldsNameOfDetailedServer[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -183,21 +182,21 @@ func (s *GetServerByIDOK) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *GetServerByIDOK) MarshalJSON() ([]byte, error) {
+func (s *DetailedServer) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetServerByIDOK) UnmarshalJSON(data []byte) error {
+func (s *DetailedServer) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes GetServerStatisticsByIDOKApplicationJSON as json.
-func (s GetServerStatisticsByIDOKApplicationJSON) Encode(e *jx.Encoder) {
-	unwrapped := []ServerStatistic(s)
+// Encode encodes ListServerStatisticsOKApplicationJSON as json.
+func (s ListServerStatisticsOKApplicationJSON) Encode(e *jx.Encoder) {
+	unwrapped := []ServerStatisticPoint(s)
 
 	e.ArrStart()
 	for _, elem := range unwrapped {
@@ -206,16 +205,16 @@ func (s GetServerStatisticsByIDOKApplicationJSON) Encode(e *jx.Encoder) {
 	e.ArrEnd()
 }
 
-// Decode decodes GetServerStatisticsByIDOKApplicationJSON from json.
-func (s *GetServerStatisticsByIDOKApplicationJSON) Decode(d *jx.Decoder) error {
+// Decode decodes ListServerStatisticsOKApplicationJSON from json.
+func (s *ListServerStatisticsOKApplicationJSON) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetServerStatisticsByIDOKApplicationJSON to nil")
+		return errors.New("invalid: unable to decode ListServerStatisticsOKApplicationJSON to nil")
 	}
-	var unwrapped []ServerStatistic
+	var unwrapped []ServerStatisticPoint
 	if err := func() error {
-		unwrapped = make([]ServerStatistic, 0)
+		unwrapped = make([]ServerStatisticPoint, 0)
 		if err := d.Arr(func(d *jx.Decoder) error {
-			var elem ServerStatistic
+			var elem ServerStatisticPoint
 			if err := elem.Decode(d); err != nil {
 				return err
 			}
@@ -228,25 +227,25 @@ func (s *GetServerStatisticsByIDOKApplicationJSON) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = GetServerStatisticsByIDOKApplicationJSON(unwrapped)
+	*s = ListServerStatisticsOKApplicationJSON(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s GetServerStatisticsByIDOKApplicationJSON) MarshalJSON() ([]byte, error) {
+func (s ListServerStatisticsOKApplicationJSON) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetServerStatisticsByIDOKApplicationJSON) UnmarshalJSON(data []byte) error {
+func (s *ListServerStatisticsOKApplicationJSON) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
 
-// Encode encodes GetServersByMultiplayerOKApplicationJSON as json.
-func (s GetServersByMultiplayerOKApplicationJSON) Encode(e *jx.Encoder) {
+// Encode encodes ListServerSummariesOKApplicationJSON as json.
+func (s ListServerSummariesOKApplicationJSON) Encode(e *jx.Encoder) {
 	unwrapped := []ServerSummary(s)
 
 	e.ArrStart()
@@ -256,10 +255,10 @@ func (s GetServersByMultiplayerOKApplicationJSON) Encode(e *jx.Encoder) {
 	e.ArrEnd()
 }
 
-// Decode decodes GetServersByMultiplayerOKApplicationJSON from json.
-func (s *GetServersByMultiplayerOKApplicationJSON) Decode(d *jx.Decoder) error {
+// Decode decodes ListServerSummariesOKApplicationJSON from json.
+func (s *ListServerSummariesOKApplicationJSON) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode GetServersByMultiplayerOKApplicationJSON to nil")
+		return errors.New("invalid: unable to decode ListServerSummariesOKApplicationJSON to nil")
 	}
 	var unwrapped []ServerSummary
 	if err := func() error {
@@ -278,19 +277,19 @@ func (s *GetServersByMultiplayerOKApplicationJSON) Decode(d *jx.Decoder) error {
 	}(); err != nil {
 		return errors.Wrap(err, "alias")
 	}
-	*s = GetServersByMultiplayerOKApplicationJSON(unwrapped)
+	*s = ListServerSummariesOKApplicationJSON(unwrapped)
 	return nil
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s GetServersByMultiplayerOKApplicationJSON) MarshalJSON() ([]byte, error) {
+func (s ListServerSummariesOKApplicationJSON) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *GetServersByMultiplayerOKApplicationJSON) UnmarshalJSON(data []byte) error {
+func (s *ListServerSummariesOKApplicationJSON) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -309,14 +308,14 @@ func (s *MultiplayerSummary) encodeFields(e *jx.Encoder) {
 		e.Str(s.Name)
 	}
 	{
-		e.FieldStart("players")
-		e.Int64(s.Players)
+		e.FieldStart("playersCount")
+		e.Int64(s.PlayersCount)
 	}
 }
 
 var jsonFieldsNameOfMultiplayerSummary = [2]string{
 	0: "name",
-	1: "players",
+	1: "playersCount",
 }
 
 // Decode decodes MultiplayerSummary from json.
@@ -340,17 +339,17 @@ func (s *MultiplayerSummary) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"name\"")
 			}
-		case "players":
+		case "playersCount":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Int64()
-				s.Players = int64(v)
+				s.PlayersCount = int64(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"players\"")
+				return errors.Wrap(err, "decode field \"playersCount\"")
 			}
 		default:
 			return d.Skip()
@@ -514,68 +513,68 @@ func (s *OptString) UnmarshalJSON(data []byte) error {
 }
 
 // Encode implements json.Marshaler.
-func (s *ServerStatistic) Encode(e *jx.Encoder) {
+func (s *ServerStatisticPoint) Encode(e *jx.Encoder) {
 	e.ObjStart()
 	s.encodeFields(e)
 	e.ObjEnd()
 }
 
 // encodeFields encodes fields.
-func (s *ServerStatistic) encodeFields(e *jx.Encoder) {
+func (s *ServerStatisticPoint) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("at")
-		json.EncodeDateTime(e, s.At)
+		e.FieldStart("collectedAt")
+		json.EncodeDateTime(e, s.CollectedAt)
 	}
 	{
-		e.FieldStart("players")
-		e.Int32(s.Players)
+		e.FieldStart("playersCount")
+		e.Int32(s.PlayersCount)
 	}
 }
 
-var jsonFieldsNameOfServerStatistic = [2]string{
-	0: "at",
-	1: "players",
+var jsonFieldsNameOfServerStatisticPoint = [2]string{
+	0: "collectedAt",
+	1: "playersCount",
 }
 
-// Decode decodes ServerStatistic from json.
-func (s *ServerStatistic) Decode(d *jx.Decoder) error {
+// Decode decodes ServerStatisticPoint from json.
+func (s *ServerStatisticPoint) Decode(d *jx.Decoder) error {
 	if s == nil {
-		return errors.New("invalid: unable to decode ServerStatistic to nil")
+		return errors.New("invalid: unable to decode ServerStatisticPoint to nil")
 	}
 	var requiredBitSet [1]uint8
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "at":
+		case "collectedAt":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
 				v, err := json.DecodeDateTime(d)
-				s.At = v
+				s.CollectedAt = v
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"at\"")
+				return errors.Wrap(err, "decode field \"collectedAt\"")
 			}
-		case "players":
+		case "playersCount":
 			requiredBitSet[0] |= 1 << 1
 			if err := func() error {
 				v, err := d.Int32()
-				s.Players = int32(v)
+				s.PlayersCount = int32(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"players\"")
+				return errors.Wrap(err, "decode field \"playersCount\"")
 			}
 		default:
 			return d.Skip()
 		}
 		return nil
 	}); err != nil {
-		return errors.Wrap(err, "decode ServerStatistic")
+		return errors.Wrap(err, "decode ServerStatisticPoint")
 	}
 	// Validate required fields.
 	var failures []validate.FieldError
@@ -592,8 +591,8 @@ func (s *ServerStatistic) Decode(d *jx.Decoder) error {
 				bitIdx := bits.TrailingZeros8(result)
 				fieldIdx := i*8 + bitIdx
 				var name string
-				if fieldIdx < len(jsonFieldsNameOfServerStatistic) {
-					name = jsonFieldsNameOfServerStatistic[fieldIdx]
+				if fieldIdx < len(jsonFieldsNameOfServerStatisticPoint) {
+					name = jsonFieldsNameOfServerStatisticPoint[fieldIdx]
 				} else {
 					name = strconv.Itoa(fieldIdx)
 				}
@@ -614,14 +613,14 @@ func (s *ServerStatistic) Decode(d *jx.Decoder) error {
 }
 
 // MarshalJSON implements stdjson.Marshaler.
-func (s *ServerStatistic) MarshalJSON() ([]byte, error) {
+func (s *ServerStatisticPoint) MarshalJSON() ([]byte, error) {
 	e := jx.Encoder{}
 	s.Encode(&e)
 	return e.Bytes(), nil
 }
 
 // UnmarshalJSON implements stdjson.Unmarshaler.
-func (s *ServerStatistic) UnmarshalJSON(data []byte) error {
+func (s *ServerStatisticPoint) UnmarshalJSON(data []byte) error {
 	d := jx.DecodeBytes(data)
 	return s.Decode(d)
 }
@@ -644,15 +643,15 @@ func (s *ServerSummary) encodeFields(e *jx.Encoder) {
 		e.Str(s.Name)
 	}
 	{
-		e.FieldStart("players")
-		e.Int32(s.Players)
+		e.FieldStart("playersCount")
+		e.Int32(s.PlayersCount)
 	}
 }
 
 var jsonFieldsNameOfServerSummary = [3]string{
 	0: "id",
 	1: "name",
-	2: "players",
+	2: "playersCount",
 }
 
 // Decode decodes ServerSummary from json.
@@ -688,17 +687,17 @@ func (s *ServerSummary) Decode(d *jx.Decoder) error {
 			}(); err != nil {
 				return errors.Wrap(err, "decode field \"name\"")
 			}
-		case "players":
+		case "playersCount":
 			requiredBitSet[0] |= 1 << 2
 			if err := func() error {
 				v, err := d.Int32()
-				s.Players = int32(v)
+				s.PlayersCount = int32(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"players\"")
+				return errors.Wrap(err, "decode field \"playersCount\"")
 			}
 		default:
 			return d.Skip()

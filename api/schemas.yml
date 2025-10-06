@@ -1,21 +1,15 @@
 components:
   schemas:
-    Order:
-      type: string
-      default: desc
-      enum:
-        - asc
-        - desc
     MultiplayerSummary:
       type: object
       required:
         - name
-        - players
+        - playersCount
       properties:
         name:
           type: string
-          description: Name of a multiplayer
-        players:
+          description: Multiplayer platform name
+        playersCount:
           type: integer
           format: int64
     ServerSummary:
@@ -23,24 +17,43 @@ components:
       required:
         - id
         - name
-        - players
+        - playersCount
       properties:
         id:
           type: string
         name:
           type: string
-        players:
+        playersCount:
           type: integer
           format: int32
-    ServerStatistic:
+    DetailedServer:
       type: object
       required:
-        - at
-        - players
+        - name
       properties:
-        at:
+        name:
+          type: string
+        url:
+          type: string
+        gamemode:
+          type: string
+        language:
+          type: string
+        playersCount:
+          type: integer
+          format: int64
+        collectedAt:
           type: string
           format: date-time
-        players:
+    ServerStatisticPoint:
+      type: object
+      required:
+        - collectedAt
+        - playersCount
+      properties:
+        collectedAt:
+          type: string
+          format: date-time
+        playersCount:
           type: integer
           format: int32

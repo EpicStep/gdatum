@@ -5,52 +5,99 @@ package domain
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"time"
 )
 
 // Repository ...
 type Repository interface {
 	InsertServers(ctx context.Context, servers []Server) error
-	GetMultiplayersSummary(ctx context.Context, playersOrder Order) ([]MultiplayerSummary, error)
-	GetServersByMultiplayer(ctx context.Context, filter ServersByMultiplayerFilter) ([]ServerSummary, error)
-	GetServerByID(ctx context.Context, multiplayer Multiplayer, id string) (Server, error)
-	GetServerStatistics(ctx context.Context, filter ServerStatisticsFilter) ([]ServerStatistic, error)
+	ListMultiplayerSummaries(ctx context.Context, playersOrderAsc bool) ([]MultiplayerSummary, error)
+	ListServerSummaries(ctx context.Context, params ListServerSummariesParams) ([]ServerSummary, error)
+	GetServer(ctx context.Context, multiplayer Multiplayer, id string) (Server, error)
+	ListServerStatistics(ctx context.Context, params ListServerStatisticsParams) ([]ServerStatisticPoint, error)
 }
 
-// Order ...
-type Order uint8
-
 const (
-	// OrderAsc ...
-	OrderAsc Order = iota
-	// OrderDesc ...
-	OrderDesc
+	serverStatisticsMaxTimeRangeDelta = time.Hour * 24 * 30 // 30 days
 )
 
-// ServersByMultiplayerFilter ...
-type ServersByMultiplayerFilter struct {
-	Multiplayer    Multiplayer
-	Count          int32
-	PlayersOrder   Order
-	IncludeOffline bool
+var (
+	errBadLimit  = errors.New("limit must be greater or equal than zero")
+	errBadOffset = errors.New("offset must be greater than zero")
+)
+
+// ListServerSummariesParams ...
+type ListServerSummariesParams struct {
+	Multiplayer     Multiplayer
+	IncludeOffline  bool
+	PlayersOrderAsc bool
+	Limit           int32
+	Offset          int32
 }
 
-// ServerStatisticsFilterPrecision ...
-type ServerStatisticsFilterPrecision uint8
+func (s ListServerSummariesParams) Validate() error {
+	if s.Limit <= 0 {
+		return errBadLimit
+	}
+
+	if s.Offset < 0 {
+		return errBadOffset
+	}
+
+	return nil
+}
+
+// ServerStatisticsPrecision ...
+type ServerStatisticsPrecision uint8
 
 const (
-	// ServerStatisticsFilterPrecisionPerHour ...
-	ServerStatisticsFilterPrecisionPerHour ServerStatisticsFilterPrecision = iota
-	// ServerStatisticsFilterPrecisionPerDay ...
-	ServerStatisticsFilterPrecisionPerDay
+	// ServerStatisticsPrecisionPerHour ...
+	ServerStatisticsPrecisionPerHour ServerStatisticsPrecision = iota
+	// ServerStatisticsPrecisionPerDay ...
+	ServerStatisticsPrecisionPerDay
 )
 
-// ServerStatisticsFilter ...
-type ServerStatisticsFilter struct {
+// TimeRange is a type that represents a range of time.
+type TimeRange struct {
+	From time.Time
+	To   time.Time
+}
+
+var (
+	errIncorrectTimeRange     = errors.New("time range is incorrect, 'From' must be greater than 'To'")
+	errTimeRangeDeltaOverflow = errors.New("delta bigger then max")
+)
+
+func (t TimeRange) Validate(maxDelta time.Duration) error {
+	if (t.From.IsZero() || t.To.IsZero()) || t.To.Before(t.From) {
+		return errIncorrectTimeRange
+	}
+
+	if maxDelta <= 0 {
+		return nil
+	}
+
+	if t.To.Sub(t.From) > maxDelta {
+		return errTimeRangeDeltaOverflow
+	}
+
+	return nil
+}
+
+// ListServerStatisticsParams ...
+type ListServerStatisticsParams struct {
 	Multiplayer Multiplayer
 	ID          string
-	TimeOrder   Order
-	Count       int32
-	LastSeen    time.Time
-	Precision   ServerStatisticsFilterPrecision
+	TimeRange   TimeRange
+	Precision   ServerStatisticsPrecision
+}
+
+func (s ListServerStatisticsParams) Validate() error {
+	if err := s.TimeRange.Validate(serverStatisticsMaxTimeRangeDelta); err != nil {
+		return fmt.Errorf("s.TimeRange.Validate: %w", err)
+	}
+
+	return nil
 }

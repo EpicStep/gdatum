@@ -7,6 +7,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+
 	"github.com/samber/lo"
 
 	"github.com/EpicStep/gdatum/internal/domain"
@@ -15,10 +17,10 @@ import (
 
 type clickhouseStore interface {
 	InsertServers(ctx context.Context, servers []clickhouse.Server) error
-	GetMultiplayersSummary(ctx context.Context, playersOrder domain.Order) ([]clickhouse.MultiplayerSummary, error)
-	GetServerByID(ctx context.Context, multiplayer domain.Multiplayer, id string) (clickhouse.Server, error)
-	GetServersByMultiplayer(ctx context.Context, filter domain.ServersByMultiplayerFilter) ([]clickhouse.ServerSummary, error)
-	GetServerStatistics(ctx context.Context, filter domain.ServerStatisticsFilter) ([]clickhouse.ServerStatistic, error)
+	ListMultiplayerSummaries(ctx context.Context, playersOrderAsc bool) ([]clickhouse.MultiplayerSummary, error)
+	ListServerSummaries(ctx context.Context, params domain.ListServerSummariesParams) ([]clickhouse.ServerSummary, error)
+	GetServer(ctx context.Context, multiplayer domain.Multiplayer, id string) (clickhouse.Server, error)
+	ListServerStatistics(ctx context.Context, params domain.ListServerStatisticsParams) ([]clickhouse.ServerStatisticPoint, error)
 }
 
 // Adapter ...
@@ -37,14 +39,14 @@ func New(store clickhouseStore) *Adapter {
 func (a *Adapter) InsertServers(ctx context.Context, servers []domain.Server) error {
 	chServers := lo.Map(servers, func(srv domain.Server, _ int) clickhouse.Server {
 		return clickhouse.Server{
-			Multiplayer: string(srv.Multiplayer),
-			ID:          srv.ID,
-			Name:        srv.Name,
-			URL:         srv.URL,
-			Gamemode:    srv.Gamemode,
-			Lang:        srv.Lang,
-			Players:     srv.Players,
-			CollectedAt: srv.CollectedAt,
+			Multiplayer:  string(srv.Multiplayer),
+			ID:           srv.ID,
+			Name:         srv.Name,
+			URL:          srv.URL,
+			Gamemode:     srv.Gamemode,
+			Language:     srv.Language,
+			PlayersCount: srv.PlayersCount,
+			CollectedAt:  srv.CollectedAt,
 		}
 	})
 
@@ -55,24 +57,24 @@ func (a *Adapter) InsertServers(ctx context.Context, servers []domain.Server) er
 	return nil
 }
 
-// GetMultiplayersSummary ...
-func (a *Adapter) GetMultiplayersSummary(ctx context.Context, playersOrder domain.Order) ([]domain.MultiplayerSummary, error) {
-	summaries, err := a.store.GetMultiplayersSummary(ctx, playersOrder)
+// ListMultiplayerSummaries ...
+func (a *Adapter) ListMultiplayerSummaries(ctx context.Context, playersOrderAsc bool) ([]domain.MultiplayerSummary, error) {
+	summaries, err := a.store.ListMultiplayerSummaries(ctx, playersOrderAsc)
 	if err != nil {
 		return nil, err
 	}
 
 	return lo.Map(summaries, func(summary clickhouse.MultiplayerSummary, _ int) domain.MultiplayerSummary {
 		return domain.MultiplayerSummary{
-			Name:    domain.Multiplayer(summary.Multiplayer),
-			Players: summary.Players,
+			Name:         domain.Multiplayer(summary.Multiplayer),
+			PlayersCount: summary.PlayersCount,
 		}
 	}), nil
 }
 
-// GetServerByID ...
-func (a *Adapter) GetServerByID(ctx context.Context, multiplayer domain.Multiplayer, id string) (domain.Server, error) {
-	chServer, err := a.store.GetServerByID(ctx, multiplayer, id)
+// GetServer ...
+func (a *Adapter) GetServer(ctx context.Context, multiplayer domain.Multiplayer, id string) (domain.Server, error) {
+	chServer, err := a.store.GetServer(ctx, multiplayer, id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Server{}, domain.ErrServerNotFound
@@ -82,36 +84,44 @@ func (a *Adapter) GetServerByID(ctx context.Context, multiplayer domain.Multipla
 	}
 
 	return domain.Server{
-		Multiplayer: domain.Multiplayer(chServer.Multiplayer),
-		ID:          chServer.ID,
-		Name:        chServer.Name,
-		URL:         chServer.URL,
-		Gamemode:    chServer.Gamemode,
-		Lang:        chServer.Lang,
-		Players:     chServer.Players,
-		CollectedAt: chServer.CollectedAt,
+		Multiplayer:  domain.Multiplayer(chServer.Multiplayer),
+		ID:           chServer.ID,
+		Name:         chServer.Name,
+		URL:          chServer.URL,
+		Gamemode:     chServer.Gamemode,
+		Language:     chServer.Language,
+		PlayersCount: chServer.PlayersCount,
+		CollectedAt:  chServer.CollectedAt,
 	}, nil
 }
 
-// GetServersByMultiplayer ...
-func (a *Adapter) GetServersByMultiplayer(ctx context.Context, filter domain.ServersByMultiplayerFilter) ([]domain.ServerSummary, error) {
-	servers, err := a.store.GetServersByMultiplayer(ctx, filter)
+// ListServerSummaries ...
+func (a *Adapter) ListServerSummaries(ctx context.Context, params domain.ListServerSummariesParams) ([]domain.ServerSummary, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("params.Validate: %w", err)
+	}
+
+	servers, err := a.store.ListServerSummaries(ctx, params)
 	if err != nil {
 		return nil, err
 	}
 
 	return lo.Map(servers, func(server clickhouse.ServerSummary, _ int) domain.ServerSummary {
 		return domain.ServerSummary{
-			ID:      server.ID,
-			Name:    server.Name,
-			Players: server.Players,
+			ID:           server.ID,
+			Name:         server.Name,
+			PlayersCount: server.PlayersCount,
 		}
 	}), nil
 }
 
-// GetServerStatistics ...
-func (a *Adapter) GetServerStatistics(ctx context.Context, filter domain.ServerStatisticsFilter) ([]domain.ServerStatistic, error) {
-	statistics, err := a.store.GetServerStatistics(ctx, filter)
+// ListServerStatistics ...
+func (a *Adapter) ListServerStatistics(ctx context.Context, params domain.ListServerStatisticsParams) ([]domain.ServerStatisticPoint, error) {
+	if err := params.Validate(); err != nil {
+		return nil, fmt.Errorf("params.Validate: %w", err)
+	}
+
+	statistics, err := a.store.ListServerStatistics(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -120,10 +130,10 @@ func (a *Adapter) GetServerStatistics(ctx context.Context, filter domain.ServerS
 		return nil, domain.ErrServerNotFound
 	}
 
-	return lo.Map(statistics, func(statistic clickhouse.ServerStatistic, _ int) domain.ServerStatistic {
-		return domain.ServerStatistic{
-			Players: statistic.Players,
-			At:      statistic.At,
+	return lo.Map(statistics, func(statistic clickhouse.ServerStatisticPoint, _ int) domain.ServerStatisticPoint {
+		return domain.ServerStatisticPoint{
+			PlayersCount: statistic.PlayersCount,
+			CollectedAt:  statistic.CollectedAt,
 		}
 	}), nil
 }

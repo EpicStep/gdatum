@@ -66,7 +66,7 @@ func run(logger *zap.Logger) error {
 		return nil
 	}
 
-	db, err := openDB(cfg.DatabaseDSN)
+	db, err := openDB(ctx, cfg.DatabaseDSN)
 	if err != nil {
 		return fmt.Errorf("openDB: %w", err)
 	}
@@ -102,7 +102,7 @@ func run(logger *zap.Logger) error {
 	return nil
 }
 
-func openDB(dsn string) (driver.Conn, error) {
+func openDB(ctx context.Context, dsn string) (driver.Conn, error) {
 	dbOpts, err := clickhouseGo.ParseDSN(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("clickhouse.ParseDSN: %w", err)
@@ -111,6 +111,13 @@ func openDB(dsn string) (driver.Conn, error) {
 	db, err := clickhouseGo.Open(dbOpts)
 	if err != nil {
 		return nil, fmt.Errorf("clickhouse.Open: %w", err)
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	if err = db.Ping(ctx); err != nil {
+		return nil, fmt.Errorf("db.Ping: %w", err)
 	}
 
 	return db, nil
