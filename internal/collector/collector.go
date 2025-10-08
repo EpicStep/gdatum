@@ -62,7 +62,7 @@ func (h *Handler) collect(ctx context.Context) []domain.Server {
 					zap.Error(err),
 				)
 
-				h.collectionErrorsTotal.WithLabelValues(string(collector.Multiplayer)).Inc()
+				h.metrics.RecordCollectionError(collector.Multiplayer)
 
 				return
 			}
@@ -72,9 +72,7 @@ func (h *Handler) collect(ctx context.Context) []domain.Server {
 				zap.Int("count", len(collectedServers)),
 			)
 
-			h.serversCollected.
-				WithLabelValues(string(collector.Multiplayer)).
-				Set(float64(len(collectedServers)))
+			h.metrics.RecordServersCollected(collector.Multiplayer, len(collectedServers))
 
 			resultMux.Lock()
 			defer resultMux.Unlock()

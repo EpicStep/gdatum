@@ -9,8 +9,6 @@ import (
 	"time"
 
 	"github.com/cenkalti/backoff/v5"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promauto"
 	"go.uber.org/zap"
 
 	ragempAdapter "github.com/EpicStep/gdatum/internal/adapters/ragemp"
@@ -19,25 +17,24 @@ import (
 	backoffUtils "github.com/EpicStep/gdatum/internal/utils/backoff"
 )
 
-const (
-	prometheusNamespaceName = "gdatum"
-	prometheusSubsystemName = "servers_stats_collector"
-)
+// Metrics is a metrics that Handler writes.
+type Metrics interface {
+	RecordServersCollected(multiplayer domain.Multiplayer, count int)
+	RecordCollectionError(multiplayer domain.Multiplayer)
+	RecordInsertError()
+}
 
 // Handler ...
 type Handler struct {
 	collectors []collectInstance
 	repo       domain.Repository
 
-	serversCollected      *prometheus.GaugeVec
-	collectionErrorsTotal *prometheus.CounterVec
-	insertErrorsTotal     prometheus.Counter
-
-	logger *zap.Logger
+	metrics Metrics
+	logger  *zap.Logger
 }
 
 // New ...
-func New(repo domain.Repository, logger *zap.Logger) *Handler {
+func New(repo domain.Repository, metrics Metrics, logger *zap.Logger) *Handler {
 	if logger == nil {
 		logger = zap.L()
 	}
@@ -53,32 +50,8 @@ func New(repo domain.Repository, logger *zap.Logger) *Handler {
 		},
 		repo: repo,
 
-		serversCollected: promauto.NewGaugeVec(
-			prometheus.GaugeOpts{
-				Namespace: prometheusNamespaceName,
-				Subsystem: prometheusSubsystemName,
-				Name:      "servers_collected",
-				Help:      "Number of servers collected from each multiplayer platform",
-			},
-			[]string{"multiplayer"}),
-		collectionErrorsTotal: promauto.NewCounterVec(
-			prometheus.CounterOpts{
-				Namespace: prometheusNamespaceName,
-				Subsystem: prometheusSubsystemName,
-				Name:      "collection_errors_total",
-				Help:      "Total number of server collection errors by multiplayer",
-			},
-			[]string{"multiplayer"}),
-		insertErrorsTotal: promauto.NewCounter(
-			prometheus.CounterOpts{
-				Namespace: prometheusNamespaceName,
-				Subsystem: prometheusSubsystemName,
-				Name:      "insert_errors_total",
-				Help:      "Total number of errors when inserting server data to repository",
-			},
-		),
-
-		logger: logger,
+		metrics: metrics,
+		logger:  logger,
 	}
 }
 
@@ -110,7 +83,7 @@ func (h *Handler) Handle(ctx context.Context) error {
 		backoff.WithMaxTries(3),
 	)
 	if err != nil {
-		h.insertErrorsTotal.Inc()
+		h.metrics.RecordInsertError()
 		return fmt.Errorf("backoff.Retry: %w", err)
 	}
 

@@ -11,8 +11,9 @@ import (
 	"os/signal"
 	"time"
 
-	clickhouseGo "github.com/ClickHouse/clickhouse-go/v2"
+	chgo "github.com/ClickHouse/clickhouse-go/v2"
 	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 
@@ -25,6 +26,7 @@ import (
 	clickhouseRepository "github.com/EpicStep/gdatum/internal/infrastructure/repository/clickhouse"
 	"github.com/EpicStep/gdatum/internal/infrastructure/server"
 	"github.com/EpicStep/gdatum/internal/infrastructure/worker"
+	"github.com/EpicStep/gdatum/internal/metrics"
 	"github.com/EpicStep/gdatum/internal/utils/migrations"
 	"github.com/EpicStep/gdatum/pkg/api"
 )
@@ -73,7 +75,7 @@ func run(logger *zap.Logger) error {
 
 	repo := clickhouseAdapter.New(clickhouseRepository.New(db))
 
-	statsHandler := collector.New(repo, logger)
+	statsHandler := collector.New(repo, metrics.NewCollectorMetrics(prometheus.DefaultRegisterer), logger)
 	statsCollectorWorker := worker.New("stats-collector", time.Hour, statsHandler.Handle, logger)
 
 	apiServer, err := api.NewServer(apiHandler.New(repo))
@@ -103,12 +105,12 @@ func run(logger *zap.Logger) error {
 }
 
 func openDB(ctx context.Context, dsn string) (driver.Conn, error) {
-	dbOpts, err := clickhouseGo.ParseDSN(dsn)
+	dbOpts, err := chgo.ParseDSN(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("clickhouse.ParseDSN: %w", err)
 	}
 
-	db, err := clickhouseGo.Open(dbOpts)
+	db, err := chgo.Open(dbOpts)
 	if err != nil {
 		return nil, fmt.Errorf("clickhouse.Open: %w", err)
 	}
