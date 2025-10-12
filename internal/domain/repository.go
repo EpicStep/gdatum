@@ -37,6 +37,7 @@ type ListServerSummariesParams struct {
 	Offset          int32
 }
 
+// Validate ...
 func (s ListServerSummariesParams) Validate() error {
 	if s.Limit <= 0 {
 		return errBadLimit
@@ -70,6 +71,7 @@ var (
 	errTimeRangeDeltaOverflow = errors.New("delta bigger then max")
 )
 
+// Validate ...
 func (t TimeRange) Validate(maxDelta time.Duration) error {
 	if (t.From.IsZero() || t.To.IsZero()) || t.To.Before(t.From) {
 		return errIncorrectTimeRange
@@ -94,6 +96,7 @@ type ListServerStatisticsParams struct {
 	Precision   ServerStatisticsPrecision
 }
 
+// Validate ...
 func (s ListServerStatisticsParams) Validate() error {
 	if err := s.TimeRange.Validate(serverStatisticsMaxTimeRangeDelta); err != nil {
 		return fmt.Errorf("s.TimeRange.Validate: %w", err)

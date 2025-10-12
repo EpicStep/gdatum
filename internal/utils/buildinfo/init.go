@@ -53,7 +53,7 @@ func initInfo() {
 
 	if !isDep {
 		for _, setting := range buildInfo.Settings {
-			switch setting.Key {
+			switch setting.Key { //revive:disable:enforce-switch-style
 			case "vcs.revision":
 				info.Commit = setting.Value
 			case "vcs.time":

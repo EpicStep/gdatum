@@ -50,11 +50,7 @@ func (a *Adapter) InsertServers(ctx context.Context, servers []domain.Server) er
 		}
 	})
 
-	if err := a.store.InsertServers(ctx, chServers); err != nil {
-		return err
-	}
-
-	return nil
+	return a.store.InsertServers(ctx, chServers)
 }
 
 // ListMultiplayerSummaries ...

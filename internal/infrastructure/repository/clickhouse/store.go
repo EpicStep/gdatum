@@ -77,7 +77,7 @@ func (s *Store) ListMultiplayerSummaries(ctx context.Context, playersOrderAsc bo
 		GroupBy(multiplayerColumnName)
 
 	if !playersOrderAsc {
-		sb = sb.OrderBy(playersCountColumnName + " DESC")
+		sb = sb.OrderByDesc(playersCountColumnName)
 	}
 
 	sqlRaw, args := sb.Build()
@@ -104,12 +104,12 @@ func (s *Store) ListServerSummaries(ctx context.Context, params domain.ListServe
 			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, hostColumnName, serversOnlineTableName, hostColumnName),
 			fmt.Sprintf("%s.%s = toStartOfHour(now())", serversOnlineTableName, collectedAtColumnName),
 		).
-		OrderBy(collectedAtColumnName + " DESC").
+		OrderByDesc(collectedAtColumnName).
 		Limit(int(params.Limit)).
 		Offset(int(params.Offset))
 
 	if !params.PlayersOrderAsc {
-		sb = sb.OrderBy(playersCountColumnName + " DESC")
+		sb = sb.OrderByDesc(playersCountColumnName)
 	}
 
 	sqlRaw, args := sb.Build()
@@ -140,7 +140,7 @@ func (s *Store) GetServer(ctx context.Context, multiplayer domain.Multiplayer, h
 			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, multiplayerColumnName, serversOnlineTableName, multiplayerColumnName),
 			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, hostColumnName, serversOnlineTableName, hostColumnName),
 			fmt.Sprintf("%s.%s = toStartOfHour(now())", serversOnlineTableName, collectedAtColumnName),
-		).OrderBy(collectedAtColumnName + " DESC").Limit(1)
+		).OrderByDesc(collectedAtColumnName).Limit(1)
 
 	sqlRaw, args := sb.Build()
 
@@ -174,7 +174,7 @@ func (s *Store) ListServerStatistics(ctx context.Context, params domain.ListServ
 			sb.LessThan(collectedAtColumnName, params.TimeRange.To),
 		).
 		GroupBy(collectedAtColumnName).
-		OrderBy(collectedAtColumnName + " DESC")
+		OrderByDesc(collectedAtColumnName)
 
 	sqlRaw, args := sql.Build(sb)
 

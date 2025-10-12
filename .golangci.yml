@@ -62,6 +62,8 @@ linters:
                        "strings.Builder.WriteByte" ]
         - name: cyclomatic
           arguments: [15]
+        - name: flag-parameter
+          disabled: true
     staticcheck:
       checks:
         - all

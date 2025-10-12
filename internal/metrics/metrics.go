@@ -15,12 +15,14 @@ const (
 	serverStatsCollectorSubsystemName = "servers_stats_collector"
 )
 
+// CollectorMetrics is a metrics for collector.
 type CollectorMetrics struct {
 	serversCollected      *prometheus.GaugeVec
 	collectionErrorsTotal *prometheus.CounterVec
 	insertErrorsTotal     prometheus.Counter
 }
 
+// NewCollectorMetrics ...
 func NewCollectorMetrics(registerer prometheus.Registerer) *CollectorMetrics {
 	if registerer == nil {
 		registerer = prometheus.DefaultRegisterer
@@ -55,16 +57,19 @@ func NewCollectorMetrics(registerer prometheus.Registerer) *CollectorMetrics {
 	}
 }
 
+// RecordServersCollected ...
 func (m *CollectorMetrics) RecordServersCollected(multiplayer domain.Multiplayer, count int) {
 	m.serversCollected.
 		WithLabelValues(string(multiplayer)).
 		Set(float64(count))
 }
 
+// RecordCollectionError ...
 func (m *CollectorMetrics) RecordCollectionError(multiplayer domain.Multiplayer) {
 	m.collectionErrorsTotal.WithLabelValues(string(multiplayer)).Inc()
 }
 
+// RecordInsertError ...
 func (m *CollectorMetrics) RecordInsertError() {
 	m.insertErrorsTotal.Inc()
 }

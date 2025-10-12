@@ -30,10 +30,7 @@ func (h *Handler) collect(ctx context.Context) []domain.Server {
 	var resultMux sync.Mutex
 
 	for _, collector := range h.collectors {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
-
+		wg.Go(func() {
 			var attempt int
 
 			collectedServers, err := backoff.Retry(
@@ -78,7 +75,7 @@ func (h *Handler) collect(ctx context.Context) []domain.Server {
 			defer resultMux.Unlock()
 
 			result = append(result, collectedServers...)
-		}()
+		})
 	}
 
 	wg.Wait()
