@@ -58,7 +58,7 @@ func (h *Handlers) ListServerSummaries(ctx context.Context, params api.ListServe
 
 	resp := api.ListServerSummariesOKApplicationJSON(lo.Map(servers, func(server domain.ServerSummary, _ int) api.ServerSummary {
 		return api.ServerSummary{
-			ID:           server.ID,
+			Host:         server.Host,
 			Name:         server.Name,
 			PlayersCount: server.PlayersCount,
 		}
@@ -69,7 +69,7 @@ func (h *Handlers) ListServerSummaries(ctx context.Context, params api.ListServe
 
 // GetServer ...
 func (h *Handlers) GetServer(ctx context.Context, params api.GetServerParams) (api.GetServerRes, error) {
-	server, err := h.repo.GetServer(ctx, domain.Multiplayer(params.MultiplayerName), params.ServerID)
+	server, err := h.repo.GetServer(ctx, domain.Multiplayer(params.MultiplayerName), params.ServerHost)
 	if err != nil {
 		if errors.Is(err, domain.ErrServerNotFound) {
 			return &api.GetServerNotFound{}, nil
@@ -85,7 +85,7 @@ func (h *Handlers) GetServer(ctx context.Context, params api.GetServerParams) (a
 func (h *Handlers) ListServerStatistics(ctx context.Context, params api.ListServerStatisticsParams) (api.ListServerStatisticsRes, error) {
 	statistics, err := h.repo.ListServerStatistics(ctx, domain.ListServerStatisticsParams{
 		Multiplayer: domain.Multiplayer(params.MultiplayerName),
-		ID:          params.ServerID,
+		Host:        params.ServerHost,
 		TimeRange: domain.TimeRange{
 			From: params.From,
 			To:   params.To,

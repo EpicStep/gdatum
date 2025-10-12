@@ -19,7 +19,7 @@ type clickhouseStore interface {
 	InsertServers(ctx context.Context, servers []clickhouse.Server) error
 	ListMultiplayerSummaries(ctx context.Context, playersOrderAsc bool) ([]clickhouse.MultiplayerSummary, error)
 	ListServerSummaries(ctx context.Context, params domain.ListServerSummariesParams) ([]clickhouse.ServerSummary, error)
-	GetServer(ctx context.Context, multiplayer domain.Multiplayer, id string) (clickhouse.Server, error)
+	GetServer(ctx context.Context, multiplayer domain.Multiplayer, host string) (clickhouse.Server, error)
 	ListServerStatistics(ctx context.Context, params domain.ListServerStatisticsParams) ([]clickhouse.ServerStatisticPoint, error)
 }
 
@@ -40,7 +40,7 @@ func (a *Adapter) InsertServers(ctx context.Context, servers []domain.Server) er
 	chServers := lo.Map(servers, func(srv domain.Server, _ int) clickhouse.Server {
 		return clickhouse.Server{
 			Multiplayer:  string(srv.Multiplayer),
-			ID:           srv.ID,
+			Host:         srv.Host,
 			Name:         srv.Name,
 			URL:          srv.URL,
 			Gamemode:     srv.Gamemode,
@@ -73,8 +73,8 @@ func (a *Adapter) ListMultiplayerSummaries(ctx context.Context, playersOrderAsc 
 }
 
 // GetServer ...
-func (a *Adapter) GetServer(ctx context.Context, multiplayer domain.Multiplayer, id string) (domain.Server, error) {
-	chServer, err := a.store.GetServer(ctx, multiplayer, id)
+func (a *Adapter) GetServer(ctx context.Context, multiplayer domain.Multiplayer, host string) (domain.Server, error) {
+	chServer, err := a.store.GetServer(ctx, multiplayer, host)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return domain.Server{}, domain.ErrServerNotFound
@@ -85,7 +85,7 @@ func (a *Adapter) GetServer(ctx context.Context, multiplayer domain.Multiplayer,
 
 	return domain.Server{
 		Multiplayer:  domain.Multiplayer(chServer.Multiplayer),
-		ID:           chServer.ID,
+		Host:         chServer.Host,
 		Name:         chServer.Name,
 		URL:          chServer.URL,
 		Gamemode:     chServer.Gamemode,
@@ -108,7 +108,7 @@ func (a *Adapter) ListServerSummaries(ctx context.Context, params domain.ListSer
 
 	return lo.Map(servers, func(server clickhouse.ServerSummary, _ int) domain.ServerSummary {
 		return domain.ServerSummary{
-			ID:           server.ID,
+			Host:         server.Host,
 			Name:         server.Name,
 			PlayersCount: server.PlayersCount,
 		}

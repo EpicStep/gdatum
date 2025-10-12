@@ -15,9 +15,9 @@ var _ Handler = UnimplementedHandler{}
 
 // GetServer implements getServer operation.
 //
-// Get server by ID.
+// Get server by host.
 //
-// GET /multiplayer/{multiplayerName}/server/{serverID}
+// GET /multiplayer/{multiplayerName}/server/{serverHost}
 func (UnimplementedHandler) GetServer(ctx context.Context, params GetServerParams) (r GetServerRes, _ error) {
 	return r, ht.ErrNotImplemented
 }
@@ -33,9 +33,9 @@ func (UnimplementedHandler) ListMultiplayerSummaries(ctx context.Context, params
 
 // ListServerStatistics implements listServerStatistics operation.
 //
-// Get server statistics by ID.
+// Get server statistics by host.
 //
-// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+// GET /multiplayer/{multiplayerName}/server/{serverHost}/statistics
 func (UnimplementedHandler) ListServerStatistics(ctx context.Context, params ListServerStatisticsParams) (r ListServerStatisticsRes, _ error) {
 	return r, ht.ErrNotImplemented
 }

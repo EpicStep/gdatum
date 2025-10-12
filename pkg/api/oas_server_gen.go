@@ -10,9 +10,9 @@ import (
 type Handler interface {
 	// GetServer implements getServer operation.
 	//
-	// Get server by ID.
+	// Get server by host.
 	//
-	// GET /multiplayer/{multiplayerName}/server/{serverID}
+	// GET /multiplayer/{multiplayerName}/server/{serverHost}
 	GetServer(ctx context.Context, params GetServerParams) (GetServerRes, error)
 	// ListMultiplayerSummaries implements listMultiplayerSummaries operation.
 	//
@@ -22,9 +22,9 @@ type Handler interface {
 	ListMultiplayerSummaries(ctx context.Context, params ListMultiplayerSummariesParams) ([]MultiplayerSummary, error)
 	// ListServerStatistics implements listServerStatistics operation.
 	//
-	// Get server statistics by ID.
+	// Get server statistics by host.
 	//
-	// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+	// GET /multiplayer/{multiplayerName}/server/{serverHost}/statistics
 	ListServerStatistics(ctx context.Context, params ListServerStatisticsParams) (ListServerStatisticsRes, error)
 	// ListServerSummaries implements listServerSummaries operation.
 	//

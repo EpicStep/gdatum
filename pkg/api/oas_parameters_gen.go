@@ -19,8 +19,8 @@ import (
 type GetServerParams struct {
 	// Multiplayer platform name.
 	MultiplayerName string
-	// Server ID.
-	ServerID string
+	// Server host.
+	ServerHost string
 }
 
 func unpackGetServerParams(packed middleware.Parameters) (params GetServerParams) {
@@ -33,10 +33,10 @@ func unpackGetServerParams(packed middleware.Parameters) (params GetServerParams
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "serverID",
+			Name: "serverHost",
 			In:   "path",
 		}
-		params.ServerID = packed[key].(string)
+		params.ServerHost = packed[key].(string)
 	}
 	return params
 }
@@ -87,7 +87,7 @@ func decodeGetServerParams(args [2]string, argsEscaped bool, r *http.Request) (p
 			Err:  err,
 		}
 	}
-	// Decode path: serverID.
+	// Decode path: serverHost.
 	if err := func() error {
 		param := args[1]
 		if argsEscaped {
@@ -99,7 +99,7 @@ func decodeGetServerParams(args [2]string, argsEscaped bool, r *http.Request) (p
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "serverID",
+				Param:   "serverHost",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -116,7 +116,7 @@ func decodeGetServerParams(args [2]string, argsEscaped bool, r *http.Request) (p
 					return err
 				}
 
-				params.ServerID = c
+				params.ServerHost = c
 				return nil
 			}(); err != nil {
 				return err
@@ -127,7 +127,7 @@ func decodeGetServerParams(args [2]string, argsEscaped bool, r *http.Request) (p
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "serverID",
+			Name: "serverHost",
 			In:   "path",
 			Err:  err,
 		}
@@ -204,8 +204,8 @@ func decodeListMultiplayerSummariesParams(args [0]string, argsEscaped bool, r *h
 type ListServerStatisticsParams struct {
 	// Multiplayer platform name.
 	MultiplayerName string
-	// Server ID.
-	ServerID string
+	// Server host.
+	ServerHost string
 	// Start of the time range.
 	From time.Time
 	// End of the time range.
@@ -224,10 +224,10 @@ func unpackListServerStatisticsParams(packed middleware.Parameters) (params List
 	}
 	{
 		key := middleware.ParameterKey{
-			Name: "serverID",
+			Name: "serverHost",
 			In:   "path",
 		}
-		params.ServerID = packed[key].(string)
+		params.ServerHost = packed[key].(string)
 	}
 	{
 		key := middleware.ParameterKey{
@@ -302,7 +302,7 @@ func decodeListServerStatisticsParams(args [2]string, argsEscaped bool, r *http.
 			Err:  err,
 		}
 	}
-	// Decode path: serverID.
+	// Decode path: serverHost.
 	if err := func() error {
 		param := args[1]
 		if argsEscaped {
@@ -314,7 +314,7 @@ func decodeListServerStatisticsParams(args [2]string, argsEscaped bool, r *http.
 		}
 		if len(param) > 0 {
 			d := uri.NewPathDecoder(uri.PathDecoderConfig{
-				Param:   "serverID",
+				Param:   "serverHost",
 				Value:   param,
 				Style:   uri.PathStyleSimple,
 				Explode: false,
@@ -331,7 +331,7 @@ func decodeListServerStatisticsParams(args [2]string, argsEscaped bool, r *http.
 					return err
 				}
 
-				params.ServerID = c
+				params.ServerHost = c
 				return nil
 			}(); err != nil {
 				return err
@@ -342,7 +342,7 @@ func decodeListServerStatisticsParams(args [2]string, argsEscaped bool, r *http.
 		return nil
 	}(); err != nil {
 		return params, &ogenerrors.DecodeParamError{
-			Name: "serverID",
+			Name: "serverHost",
 			In:   "path",
 			Err:  err,
 		}

@@ -3,14 +3,14 @@
 CREATE TABLE servers_info
 (
     multiplayer  LowCardinality(String),
-    id           String,
+    host         String,
     name         String,
     url          String,
     gamemode     String,
     language     String,
     collected_at Datetime
 ) ENGINE = ReplacingMergeTree()
-      ORDER BY (id, multiplayer)
+      ORDER BY (host, multiplayer)
       PARTITION BY toYYYYMM(collected_at);
 -- +goose StatementEnd
 

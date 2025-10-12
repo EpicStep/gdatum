@@ -11,7 +11,7 @@ const (
 	serversOnlineTableName     = "servers_online"
 
 	multiplayerColumnName  = "multiplayer"
-	idColumnName           = "id"
+	hostColumnName         = "host"
 	nameColumnName         = "name"
 	languageColumnName     = "language"
 	gamemodeColumnName     = "gamemode"
@@ -23,7 +23,7 @@ const (
 // Server ...
 type Server struct {
 	Multiplayer  string    `ch:"multiplayer"`
-	ID           string    `ch:"id"`
+	Host         string    `ch:"host"`
 	Name         string    `ch:"name"`
 	URL          string    `ch:"url"`
 	Gamemode     string    `ch:"gamemode"`
@@ -46,7 +46,7 @@ type ServerStatisticPoint struct {
 
 // ServerSummary ...
 type ServerSummary struct {
-	ID           string `ch:"id"`
+	Host         string `ch:"host"`
 	Name         string `ch:"name"`
 	PlayersCount int32  `ch:"players_count"`
 }

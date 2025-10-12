@@ -15,11 +15,11 @@ components:
     ServerSummary:
       type: object
       required:
-        - id
+        - host
         - name
         - playersCount
       properties:
-        id:
+        host:
           type: string
         name:
           type: string

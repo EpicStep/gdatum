@@ -35,7 +35,7 @@ func (s *Store) InsertServers(ctx context.Context, servers []Server) error {
 	ib := sqlbuilder.
 		NewInsertBuilder().
 		InsertInto(serversMetricsRawTableName).
-		Cols(multiplayerColumnName, idColumnName, nameColumnName, languageColumnName, gamemodeColumnName, urlColumnName, playersCountColumnName, collectedAtColumnName)
+		Cols(multiplayerColumnName, hostColumnName, nameColumnName, languageColumnName, gamemodeColumnName, urlColumnName, playersCountColumnName, collectedAtColumnName)
 
 	sqlRaw, _ := sql.Build(ib)
 
@@ -47,7 +47,7 @@ func (s *Store) InsertServers(ctx context.Context, servers []Server) error {
 	for _, server := range servers {
 		err = batch.Append(
 			server.Multiplayer,
-			server.ID,
+			server.Host,
 			server.Name,
 			server.Language,
 			server.Gamemode,
@@ -95,13 +95,13 @@ func (s *Store) ListServerSummaries(ctx context.Context, params domain.ListServe
 	sb := sqlbuilder.NewSelectBuilder()
 
 	sb = sb.From(serversInfoTableName).
-		Select(idColumnName, nameColumnName, playersCountColumnName).
+		Select(hostColumnName, nameColumnName, playersCountColumnName).
 		Where(sb.Equal(multiplayerColumnName, string(params.Multiplayer))).
 		JoinWithOption(
 			sqlbuilder.LeftJoin,
 			serversOnlineTableName,
 			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, multiplayerColumnName, serversOnlineTableName, multiplayerColumnName),
-			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, idColumnName, serversOnlineTableName, idColumnName),
+			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, hostColumnName, serversOnlineTableName, hostColumnName),
 			fmt.Sprintf("%s.%s = toStartOfHour(now())", serversOnlineTableName, collectedAtColumnName),
 		).
 		OrderBy(collectedAtColumnName + " DESC").
@@ -123,22 +123,22 @@ func (s *Store) ListServerSummaries(ctx context.Context, params domain.ListServe
 }
 
 // GetServer ...
-func (s *Store) GetServer(ctx context.Context, multiplayer domain.Multiplayer, id string) (Server, error) {
+func (s *Store) GetServer(ctx context.Context, multiplayer domain.Multiplayer, host string) (Server, error) {
 	sb := sqlbuilder.NewSelectBuilder()
 
 	sb = sb.From(serversInfoTableName).
-		Select(multiplayerColumnName, idColumnName, nameColumnName, languageColumnName, gamemodeColumnName, urlColumnName, playersCountColumnName, collectedAtColumnName).
+		Select(multiplayerColumnName, hostColumnName, nameColumnName, languageColumnName, gamemodeColumnName, urlColumnName, playersCountColumnName, collectedAtColumnName).
 		Where(
 			sb.And(
 				sb.Equal(multiplayerColumnName, multiplayer),
-				sb.Equal(idColumnName, id),
+				sb.Equal(hostColumnName, host),
 			),
 		).
 		JoinWithOption(
 			sqlbuilder.LeftJoin,
 			serversOnlineTableName,
 			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, multiplayerColumnName, serversOnlineTableName, multiplayerColumnName),
-			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, idColumnName, serversOnlineTableName, idColumnName),
+			fmt.Sprintf("%s.%s = %s.%s", serversInfoTableName, hostColumnName, serversOnlineTableName, hostColumnName),
 			fmt.Sprintf("%s.%s = toStartOfHour(now())", serversOnlineTableName, collectedAtColumnName),
 		).OrderBy(collectedAtColumnName + " DESC").Limit(1)
 
@@ -169,7 +169,7 @@ func (s *Store) ListServerStatistics(ctx context.Context, params domain.ListServ
 		).
 		Where(
 			sb.Equal(multiplayerColumnName, string(params.Multiplayer)),
-			sb.Equal(idColumnName, params.ID),
+			sb.Equal(hostColumnName, params.Host),
 			sb.GreaterThan(collectedAtColumnName, params.TimeRange.From),
 			sb.LessThan(collectedAtColumnName, params.TimeRange.To),
 		).

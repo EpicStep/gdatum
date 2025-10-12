@@ -475,14 +475,14 @@ func (s *ServerStatisticPoint) SetPlayersCount(val int32) {
 
 // Ref: #/components/schemas/ServerSummary
 type ServerSummary struct {
-	ID           string `json:"id"`
+	Host         string `json:"host"`
 	Name         string `json:"name"`
 	PlayersCount int32  `json:"playersCount"`
 }
 
-// GetID returns the value of ID.
-func (s *ServerSummary) GetID() string {
-	return s.ID
+// GetHost returns the value of Host.
+func (s *ServerSummary) GetHost() string {
+	return s.Host
 }
 
 // GetName returns the value of Name.
@@ -495,9 +495,9 @@ func (s *ServerSummary) GetPlayersCount() int32 {
 	return s.PlayersCount
 }
 
-// SetID sets the value of ID.
-func (s *ServerSummary) SetID(val string) {
-	s.ID = val
+// SetHost sets the value of Host.
+func (s *ServerSummary) SetHost(val string) {
+	s.Host = val
 }
 
 // SetName sets the value of Name.

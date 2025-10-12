@@ -3,7 +3,7 @@
 CREATE TABLE servers_metrics_raw
 (
     multiplayer   LowCardinality(String),
-    id            String, -- it’s almost an IP address, but sometimes it may not be
+    host          String,
     name          String,
     url           String,
     gamemode      String,

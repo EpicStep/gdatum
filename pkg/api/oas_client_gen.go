@@ -29,9 +29,9 @@ func trimTrailingSlashes(u *url.URL) {
 type Invoker interface {
 	// GetServer invokes getServer operation.
 	//
-	// Get server by ID.
+	// Get server by host.
 	//
-	// GET /multiplayer/{multiplayerName}/server/{serverID}
+	// GET /multiplayer/{multiplayerName}/server/{serverHost}
 	GetServer(ctx context.Context, params GetServerParams) (GetServerRes, error)
 	// ListMultiplayerSummaries invokes listMultiplayerSummaries operation.
 	//
@@ -41,9 +41,9 @@ type Invoker interface {
 	ListMultiplayerSummaries(ctx context.Context, params ListMultiplayerSummariesParams) ([]MultiplayerSummary, error)
 	// ListServerStatistics invokes listServerStatistics operation.
 	//
-	// Get server statistics by ID.
+	// Get server statistics by host.
 	//
-	// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+	// GET /multiplayer/{multiplayerName}/server/{serverHost}/statistics
 	ListServerStatistics(ctx context.Context, params ListServerStatisticsParams) (ListServerStatisticsRes, error)
 	// ListServerSummaries invokes listServerSummaries operation.
 	//
@@ -98,9 +98,9 @@ func (c *Client) requestURL(ctx context.Context) *url.URL {
 
 // GetServer invokes getServer operation.
 //
-// Get server by ID.
+// Get server by host.
 //
-// GET /multiplayer/{multiplayerName}/server/{serverID}
+// GET /multiplayer/{multiplayerName}/server/{serverHost}
 func (c *Client) GetServer(ctx context.Context, params GetServerParams) (GetServerRes, error) {
 	res, err := c.sendGetServer(ctx, params)
 	return res, err
@@ -110,7 +110,7 @@ func (c *Client) sendGetServer(ctx context.Context, params GetServerParams) (res
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getServer"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.URLTemplateKey.String("/multiplayer/{multiplayerName}/server/{serverID}"),
+		semconv.URLTemplateKey.String("/multiplayer/{multiplayerName}/server/{serverHost}"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -165,14 +165,14 @@ func (c *Client) sendGetServer(ctx context.Context, params GetServerParams) (res
 	}
 	pathParts[2] = "/server/"
 	{
-		// Encode "serverID" parameter.
+		// Encode "serverHost" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "serverID",
+			Param:   "serverHost",
 			Style:   uri.PathStyleSimple,
 			Explode: false,
 		})
 		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ServerID))
+			return e.EncodeValue(conv.StringToString(params.ServerHost))
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}
@@ -302,9 +302,9 @@ func (c *Client) sendListMultiplayerSummaries(ctx context.Context, params ListMu
 
 // ListServerStatistics invokes listServerStatistics operation.
 //
-// Get server statistics by ID.
+// Get server statistics by host.
 //
-// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+// GET /multiplayer/{multiplayerName}/server/{serverHost}/statistics
 func (c *Client) ListServerStatistics(ctx context.Context, params ListServerStatisticsParams) (ListServerStatisticsRes, error) {
 	res, err := c.sendListServerStatistics(ctx, params)
 	return res, err
@@ -314,7 +314,7 @@ func (c *Client) sendListServerStatistics(ctx context.Context, params ListServer
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listServerStatistics"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.URLTemplateKey.String("/multiplayer/{multiplayerName}/server/{serverID}/statistics"),
+		semconv.URLTemplateKey.String("/multiplayer/{multiplayerName}/server/{serverHost}/statistics"),
 	}
 	otelAttrs = append(otelAttrs, c.cfg.Attributes...)
 
@@ -369,14 +369,14 @@ func (c *Client) sendListServerStatistics(ctx context.Context, params ListServer
 	}
 	pathParts[2] = "/server/"
 	{
-		// Encode "serverID" parameter.
+		// Encode "serverHost" parameter.
 		e := uri.NewPathEncoder(uri.PathEncoderConfig{
-			Param:   "serverID",
+			Param:   "serverHost",
 			Style:   uri.PathStyleSimple,
 			Explode: false,
 		})
 		if err := func() error {
-			return e.EncodeValue(conv.StringToString(params.ServerID))
+			return e.EncodeValue(conv.StringToString(params.ServerHost))
 		}(); err != nil {
 			return res, errors.Wrap(err, "encode path")
 		}

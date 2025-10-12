@@ -71,11 +71,11 @@ paths:
           $ref: "responses.yml#/components/responses/ListServerSummariesOK"
         '404':
           description: Multiplayer not found
-  '/multiplayer/{multiplayerName}/server/{serverID}':
+  '/multiplayer/{multiplayerName}/server/{serverHost}':
     get:
       tags:
         - monitoring
-      summary: Get server by ID
+      summary: Get server by host
       operationId: getServer
       parameters:
         - name: multiplayerName
@@ -84,9 +84,9 @@ paths:
           required: true
           schema:
             type: string
-        - name: serverID
+        - name: serverHost
           in: path
-          description: Server ID
+          description: Server host
           required: true
           schema:
             type: string
@@ -95,11 +95,11 @@ paths:
           $ref: "responses.yml#/components/responses/GetServerOK"
         '404':
           description: Server not found
-  '/multiplayer/{multiplayerName}/server/{serverID}/statistics':
+  '/multiplayer/{multiplayerName}/server/{serverHost}/statistics':
     get:
       tags:
         - monitoring
-      summary: Get server statistics by ID
+      summary: Get server statistics by host
       operationId: listServerStatistics
       parameters:
         - name: multiplayerName
@@ -108,9 +108,9 @@ paths:
           required: true
           schema:
             type: string
-        - name: serverID
+        - name: serverHost
           in: path
-          description: Server ID
+          description: Server host
           required: true
           schema:
             type: string

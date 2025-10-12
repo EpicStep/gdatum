@@ -635,8 +635,8 @@ func (s *ServerSummary) Encode(e *jx.Encoder) {
 // encodeFields encodes fields.
 func (s *ServerSummary) encodeFields(e *jx.Encoder) {
 	{
-		e.FieldStart("id")
-		e.Str(s.ID)
+		e.FieldStart("host")
+		e.Str(s.Host)
 	}
 	{
 		e.FieldStart("name")
@@ -649,7 +649,7 @@ func (s *ServerSummary) encodeFields(e *jx.Encoder) {
 }
 
 var jsonFieldsNameOfServerSummary = [3]string{
-	0: "id",
+	0: "host",
 	1: "name",
 	2: "playersCount",
 }
@@ -663,17 +663,17 @@ func (s *ServerSummary) Decode(d *jx.Decoder) error {
 
 	if err := d.ObjBytes(func(d *jx.Decoder, k []byte) error {
 		switch string(k) {
-		case "id":
+		case "host":
 			requiredBitSet[0] |= 1 << 0
 			if err := func() error {
 				v, err := d.Str()
-				s.ID = string(v)
+				s.Host = string(v)
 				if err != nil {
 					return err
 				}
 				return nil
 			}(); err != nil {
-				return errors.Wrap(err, "decode field \"id\"")
+				return errors.Wrap(err, "decode field \"host\"")
 			}
 		case "name":
 			requiredBitSet[0] |= 1 << 1

@@ -15,7 +15,7 @@ type Repository interface {
 	InsertServers(ctx context.Context, servers []Server) error
 	ListMultiplayerSummaries(ctx context.Context, playersOrderAsc bool) ([]MultiplayerSummary, error)
 	ListServerSummaries(ctx context.Context, params ListServerSummariesParams) ([]ServerSummary, error)
-	GetServer(ctx context.Context, multiplayer Multiplayer, id string) (Server, error)
+	GetServer(ctx context.Context, multiplayer Multiplayer, host string) (Server, error)
 	ListServerStatistics(ctx context.Context, params ListServerStatisticsParams) ([]ServerStatisticPoint, error)
 }
 
@@ -89,7 +89,7 @@ func (t TimeRange) Validate(maxDelta time.Duration) error {
 // ListServerStatisticsParams ...
 type ListServerStatisticsParams struct {
 	Multiplayer Multiplayer
-	ID          string
+	Host        string
 	TimeRange   TimeRange
 	Precision   ServerStatisticsPrecision
 }

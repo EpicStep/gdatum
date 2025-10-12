@@ -5,7 +5,6 @@ package ragemp
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	"github.com/samber/lo"
@@ -37,14 +36,10 @@ func (a *Adapter) Servers(ctx context.Context, collectedAt time.Time) ([]domain.
 		return nil, err
 	}
 
-	return lo.MapToSlice(servers, func(ip string, server ragemp.Server) domain.Server {
-		if index := strings.Index(ip, ":"); index != -1 {
-			ip = ip[:index] // remove port
-		}
-
+	return lo.MapToSlice(servers, func(host string, server ragemp.Server) domain.Server {
 		return domain.Server{
 			Multiplayer:  domain.MultiplayerRagemp,
-			ID:           ip,
+			Host:         host,
 			Name:         server.Name,
 			Gamemode:     server.Gamemode,
 			Language:     server.Language,

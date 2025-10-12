@@ -30,7 +30,7 @@ type ServerStatisticPoint struct {
 // Server ...
 type Server struct {
 	Multiplayer  Multiplayer
-	ID           string
+	Host         string
 	Name         string
 	URL          string
 	Gamemode     string
@@ -41,7 +41,7 @@ type Server struct {
 
 // ServerSummary ...
 type ServerSummary struct {
-	ID           string
+	Host         string
 	Name         string
 	PlayersCount int32
 }

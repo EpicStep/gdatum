@@ -31,16 +31,16 @@ func (c *codeRecorder) WriteHeader(status int) {
 
 // handleGetServerRequest handles getServer operation.
 //
-// Get server by ID.
+// Get server by host.
 //
-// GET /multiplayer/{multiplayerName}/server/{serverID}
+// GET /multiplayer/{multiplayerName}/server/{serverHost}
 func (s *Server) handleGetServerRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("getServer"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/multiplayer/{multiplayerName}/server/{serverID}"),
+		semconv.HTTPRouteKey.String("/multiplayer/{multiplayerName}/server/{serverHost}"),
 	}
 
 	// Start a span for this request.
@@ -121,7 +121,7 @@ func (s *Server) handleGetServerRequest(args [2]string, argsEscaped bool, w http
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    GetServerOperation,
-			OperationSummary: "Get server by ID",
+			OperationSummary: "Get server by host",
 			OperationID:      "getServer",
 			Body:             nil,
 			RawBody:          rawBody,
@@ -131,9 +131,9 @@ func (s *Server) handleGetServerRequest(args [2]string, argsEscaped bool, w http
 					In:   "path",
 				}: params.MultiplayerName,
 				{
-					Name: "serverID",
+					Name: "serverHost",
 					In:   "path",
-				}: params.ServerID,
+				}: params.ServerHost,
 			},
 			Raw: r,
 		}
@@ -317,16 +317,16 @@ func (s *Server) handleListMultiplayerSummariesRequest(args [0]string, argsEscap
 
 // handleListServerStatisticsRequest handles listServerStatistics operation.
 //
-// Get server statistics by ID.
+// Get server statistics by host.
 //
-// GET /multiplayer/{multiplayerName}/server/{serverID}/statistics
+// GET /multiplayer/{multiplayerName}/server/{serverHost}/statistics
 func (s *Server) handleListServerStatisticsRequest(args [2]string, argsEscaped bool, w http.ResponseWriter, r *http.Request) {
 	statusWriter := &codeRecorder{ResponseWriter: w}
 	w = statusWriter
 	otelAttrs := []attribute.KeyValue{
 		otelogen.OperationID("listServerStatistics"),
 		semconv.HTTPRequestMethodKey.String("GET"),
-		semconv.HTTPRouteKey.String("/multiplayer/{multiplayerName}/server/{serverID}/statistics"),
+		semconv.HTTPRouteKey.String("/multiplayer/{multiplayerName}/server/{serverHost}/statistics"),
 	}
 
 	// Start a span for this request.
@@ -407,7 +407,7 @@ func (s *Server) handleListServerStatisticsRequest(args [2]string, argsEscaped b
 		mreq := middleware.Request{
 			Context:          ctx,
 			OperationName:    ListServerStatisticsOperation,
-			OperationSummary: "Get server statistics by ID",
+			OperationSummary: "Get server statistics by host",
 			OperationID:      "listServerStatistics",
 			Body:             nil,
 			RawBody:          rawBody,
@@ -417,9 +417,9 @@ func (s *Server) handleListServerStatisticsRequest(args [2]string, argsEscaped b
 					In:   "path",
 				}: params.MultiplayerName,
 				{
-					Name: "serverID",
+					Name: "serverHost",
 					In:   "path",
-				}: params.ServerID,
+				}: params.ServerHost,
 				{
 					Name: "from",
 					In:   "query",

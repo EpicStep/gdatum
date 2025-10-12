@@ -102,7 +102,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 							break
 						}
 
-						// Param: "serverID"
+						// Param: "serverHost"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -331,7 +331,7 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							break
 						}
 
-						// Param: "serverID"
+						// Param: "serverHost"
 						// Match until "/"
 						idx := strings.IndexByte(elem, '/')
 						if idx < 0 {
@@ -344,9 +344,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 							switch method {
 							case "GET":
 								r.name = GetServerOperation
-								r.summary = "Get server by ID"
+								r.summary = "Get server by host"
 								r.operationID = "getServer"
-								r.pathPattern = "/multiplayer/{multiplayerName}/server/{serverID}"
+								r.pathPattern = "/multiplayer/{multiplayerName}/server/{serverHost}"
 								r.args = args
 								r.count = 2
 								return r, true
@@ -368,9 +368,9 @@ func (s *Server) FindPath(method string, u *url.URL) (r Route, _ bool) {
 								switch method {
 								case "GET":
 									r.name = ListServerStatisticsOperation
-									r.summary = "Get server statistics by ID"
+									r.summary = "Get server statistics by host"
 									r.operationID = "listServerStatistics"
-									r.pathPattern = "/multiplayer/{multiplayerName}/server/{serverID}/statistics"
+									r.pathPattern = "/multiplayer/{multiplayerName}/server/{serverHost}/statistics"
 									r.args = args
 									r.count = 2
 									return r, true
