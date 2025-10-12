@@ -55,44 +55,21 @@ archives:
 checksum:
   name_template: "checksums.txt"
 
-dockers:
-  - image_templates:
-      - "{{ .Env.IMAGE_NAME }}:v{{ .Version }}-amd64"
-    dockerfile: Containerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.description=Make game servers stats great again!"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--platform=linux/amd64"
-  - image_templates:
-      - "{{ .Env.IMAGE_NAME }}:v{{ .Version }}-arm64"
-    dockerfile: Containerfile
-    use: buildx
-    build_flag_templates:
-      - "--pull"
-      - "--label=org.opencontainers.image.description=Make game servers stats great again!"
-      - "--label=org.opencontainers.image.created={{.Date}}"
-      - "--label=org.opencontainers.image.name={{.ProjectName}}"
-      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
-      - "--label=org.opencontainers.image.version={{.Version}}"
-      - "--label=org.opencontainers.image.source={{.GitURL}}"
-      - "--platform=linux/arm64"
-    goarch: arm64
-
-docker_manifests:
-  - name_template: "{{ .Env.IMAGE_NAME }}:v{{ .Version }}"
-    image_templates:
-      - "{{ .Env.IMAGE_NAME }}:v{{ .Version }}-amd64"
-      - "{{ .Env.IMAGE_NAME }}:v{{ .Version }}-arm64"
-  - name_template: "{{ .Env.IMAGE_NAME }}:latest"
-    image_templates:
-      - "{{ .Env.IMAGE_NAME }}:v{{ .Version }}-amd64"
-      - "{{ .Env.IMAGE_NAME }}:v{{ .Version }}-arm64"
+dockers_v2:
+  - dockerfile: Containerfile
+    tags:
+      - "v{{ .Version }}"
+      - "latest"
+    platforms:
+      - linux/amd64
+      - linux/arm64
+    labels:
+      "org.opencontainers.image.description": "Make game servers stats great again!"
+      "org.opencontainers.image.created": "{{.Date}}"
+      "org.opencontainers.image.name": "{{.ProjectName}}"
+      "org.opencontainers.image.revision": "{{.FullCommit}}"
+      "org.opencontainers.image.version": "{{.Version}}"
+      "org.opencontainers.image.source": "{{.GitURL}}"
 
 sboms:
   - artifacts: archive

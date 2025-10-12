@@ -8,11 +8,11 @@ require (
 	github.com/go-faster/errors v0.7.1
 	github.com/go-faster/jx v1.1.0
 	github.com/go-ozzo/ozzo-validation/v4 v4.3.0
-	github.com/huandu/go-sqlbuilder v1.37.0
+	github.com/huandu/go-sqlbuilder v1.38.0
 	github.com/ogen-go/ogen v1.16.0
 	github.com/pressly/goose/v3 v3.26.0
 	github.com/prometheus/client_golang v1.23.2
-	github.com/samber/lo v1.51.0
+	github.com/samber/lo v1.52.0
 	github.com/stretchr/testify v1.11.1
 	go.opentelemetry.io/otel v1.38.0
 	go.opentelemetry.io/otel/metric v1.38.0

@@ -1,8 +1,16 @@
-GOLANGCI_LINT_VERSION = 2.1.6
+GOLANGCI_LINT_VERSION = 2.5.0
 ACTIONLINT_VERSION = 1.7.7
+
+IMAGE_NAME = 'ghcr.io/epicstep/gdatum'
+IMAGE_VERSION = 'latest'
 
 generate:
 	go generate ./...
+
+docker-build:
+	GOARCH=amd64 GOOS=linux go build -o gdatum cmd/app/main.go
+	docker build -f Containerfile -t $(IMAGE_NAME):$(IMAGE_VERSION) .
+	rm -rf gdatum
 
 test:
 	go test --timeout 10m -race ./...
