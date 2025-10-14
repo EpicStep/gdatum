@@ -7,9 +7,9 @@ if [[ $# -ne 1 ]]; then
   exit 1
 fi
 
-BUMP_TYPE=${1}
+BUMP_TYPE="${1}"
 
-case ${BUMP_TYPE} in
+case "${BUMP_TYPE}" in
   patch|minor|major)
     ;;
   *)
@@ -19,19 +19,18 @@ case ${BUMP_TYPE} in
 esac
 
 LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0")
-VERSION=${LATEST_TAG#v}
 
-IFS='.' read -r MAJOR MINOR PATCH <<< "${VERSION}"
+IFS='.' read -r MAJOR MINOR PATCH <<< "${LATEST_TAG#v}"
 
-case ${BUMP_TYPE} in
-  patch)
+case "${BUMP_TYPE}" in
+  "patch")
     PATCH=$((PATCH + 1))
     ;;
-  minor)
+  "minor")
     MINOR=$((MINOR + 1))
     PATCH=0
     ;;
-  major)
+  "major")
     MAJOR=$((MAJOR + 1))
     MINOR=0
     PATCH=0

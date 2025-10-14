@@ -1,4 +1,5 @@
-FROM gcr.io/distroless/static-debian12:nonroot
+ARG IMG_TAG=nonroot
+FROM gcr.io/distroless/static-debian12:${IMG_TAG}
 
 COPY --chown=nonroot:nonroot /gdatum ./gdatum
 
