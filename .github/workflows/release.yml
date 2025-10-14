@@ -40,7 +40,7 @@ jobs:
       - name: Setup cosign
         uses: sigstore/cosign-installer@v3
       - name: Setup syft
-        uses: anchore/sbom-action/download-syft@v0.20.4
+        uses: anchore/sbom-action/download-syft@v0.20.6
       - name: Setup Git
         run: |
           git config --global user.name "github-actions"
